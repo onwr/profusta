@@ -1,0 +1,90 @@
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "ProfUSTA";
+
+/** Tarayıcı sessionStorage — kullanıcı konumu (bana yakın) */
+export const STORAGE_USER_LOCATION = "profusta_location";
+
+/** Header il/ilçe değişince dinlenir */
+export const EVENT_LOCATION_CHANGED = "profusta:location-changed";
+
+export const ROUTES = {
+  home: "/",
+  categories: "/hizmetler",
+  createRequest: "/talep-olustur",
+  listings: "/ilanlar",
+  login: "/giris",
+  register: "/kayit",
+  providerApply: "/usta-basvuru",
+  customer: {
+    dashboard: "/musteri",
+    requests: "/musteri/talepler",
+    offers: "/musteri/teklifler",
+    orders: "/musteri/siparisler",
+    messages: "/musteri/mesajlar",
+    favorites: "/musteri/favoriler",
+    profile: "/musteri/profil",
+    reviews: "/musteri/yorumlar",
+    refundsDisputes: "/musteri/iade-itiraz",
+  },
+  provider: {
+    dashboard: "/usta",
+    requests: "/usta/talepler",
+    offers: "/usta/teklifler",
+    profile: "/usta/profil",
+    categories: "/usta/kategoriler",
+    areas: "/usta/bolgeler",
+    listings: "/usta/ilanlar",
+    messages: "/usta/mesajlar",
+    jobs: "/usta/isler",
+    jobsCompleted: "/usta/isler/tamamlanan",
+    earnings: "/usta/kazanclar",
+    payouts: "/usta/odeme-talepleri",
+    reviews: "/usta/yorumlar",
+    favorites: "/usta/favoriler",
+    notifications: "/usta/bildirimler",
+  },
+  payment: (orderId: string) => `/odeme/${orderId}`,
+  providers: "/ustalar",
+  admin: {
+    dashboard: "/admin",
+    users: "/admin/kullanicilar",
+    providers: "/admin/ustalar",
+    applications: "/admin/usta-basvurulari",
+    categories: "/admin/kategoriler",
+    services: "/admin/hizmetler",
+    requests: "/admin/talepler",
+    listings: "/admin/ilanlar",
+    orders: "/admin/siparisler",
+    payments: "/admin/odemeler",
+    commission: "/admin/komisyon",
+    iyzicoSettings: "/admin/iyzico-ayarlari",
+    refundsDisputes: "/admin/iade-itirazlar",
+    reviews: "/admin/yorumlar",
+    offers: "/admin/teklifler",
+    reports: "/admin/raporlar",
+    siteSettings: "/admin/site-ayarlari",
+    homepage: "/admin/anasayfa",
+    googleOAuth: "/admin/google-giris",
+    serviceAreas: "/admin/hizmet-bolgeleri",
+  },
+  static: {
+    about: "/hakkimizda",
+    contact: "/iletisim",
+    faq: "/sss",
+    howItWorks: "/nasil-calisir",
+    terms: "/kullanim-sartlari",
+    privacy: "/gizlilik",
+  },
+} as const;
+
+export const SERVICE_CATEGORIES = [
+  "Klima",
+  "Kombi",
+  "Elektrikçi",
+  "Tesisatçı",
+  "Petek Temizliği",
+  "Beyaz Eşya Tamiri",
+  "Mobilya Montajı",
+  "Korniş / Perde Montajı",
+  "Uydu / TV Kurulumu",
+  "Çilingir",
+] as const;

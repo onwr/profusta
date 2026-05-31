@@ -1,0 +1,885 @@
+// ProfUSTA — Veritabanı şeması
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum ProviderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum DocumentType {
+  ID_CARD
+  TRADE_LICENSE
+  CERTIFICATE
+  OTHER
+}
+
+enum RequestStatus {
+  OPEN
+  OFFER_ACCEPTED
+  CANCELLED
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ListingStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  INACTIVE
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  PRIVATE_OFFER
+}
+
+enum PrivateOfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID_ESCROW
+  PROVIDER_ACCEPTED
+  IN_PROGRESS
+  COMPLETED_BY_PROVIDER
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  DISPUTED
+  PAYOUT_PENDING
+  PAYOUT_COMPLETED
+}
+
+enum OrderSourceType {
+  REQUEST_OFFER
+  PRIVATE_OFFER
+  LISTING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum BalanceEntryType {
+  CREDIT
+  DEBIT
+  PAYOUT
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum RefundRequestedBy {
+  CUSTOMER
+  PROVIDER
+}
+
+enum RefundScenario {
+  PRE_ACCEPT
+  AFTER_ACCEPT
+  IN_PROGRESS
+  PROVIDER_CANCEL
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+enum DisputePhase {
+  AWAITING_PROVIDER
+  AWAITING_CUSTOMER
+  CLOSED
+}
+
+enum DisputeEventType {
+  CUSTOMER_OPENED
+  PROVIDER_MESSAGE
+  PROVIDER_RESUBMITTED
+  CUSTOMER_ACCEPTED
+  CUSTOMER_REJECTED
+  ADMIN_RESOLVED
+  ADMIN_REJECTED
+}
+
+enum DisputeActorRole {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum NotificationType {
+  OFFER
+  MESSAGE
+  ORDER
+  PAYMENT
+  SYSTEM
+}
+
+enum CouponDiscountType {
+  PERCENT
+  FIXED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  googleSub    String?  @unique @map("google_sub")
+  fullName     String   @map("full_name")
+  avatarUrl    String?  @map("avatar_url")
+  phone        String?
+  role         UserRole @default(CUSTOMER)
+  isActive     Boolean  @default(true) @map("is_active")
+  referredByUserId String? @map("referred_by_user_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  provider            Provider?
+  referredBy          User?  @relation("UserReferrals", fields: [referredByUserId], references: [id], onDelete: SetNull)
+  referrals           User[] @relation("UserReferrals")
+  passwordResetTokens PasswordResetToken[]
+  serviceRequests     ServiceRequest[]
+  customerConversations Conversation[] @relation("CustomerConversations")
+  sentMessages          Message[]
+  orders                Order[]        @relation("CustomerOrders")
+  reviews               Review[]       @relation("CustomerReviews")
+  disputes              Dispute[]
+  notifications         Notification[]
+  favorites             Favorite[]
+  adminLogs             AdminLog[]     @relation("AdminLogs")
+
+  @@map("users")
+}
+
+model Provider {
+  id              String         @id @default(cuid())
+  userId          String         @unique @map("user_id")
+  slug            String?        @unique
+  status          ProviderStatus @default(PENDING)
+  bio             String?        @db.Text
+  iban            String?
+  baseCity        String?        @map("base_city")
+  baseDistrict    String?        @map("base_district")
+  baseLatitude    Float?         @map("base_latitude")
+  baseLongitude   Float?         @map("base_longitude")
+  serviceRadiusKm Int?           @default(20) @map("service_radius_km")
+  isPro           Boolean        @default(false) @map("is_pro")
+  rejectedReason  String?        @map("rejected_reason") @db.Text
+  approvedAt      DateTime?      @map("approved_at")
+  cancelCount     Int            @default(0) @map("cancel_count")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents    ProviderDocument[]
+  faqs         ProviderFaq[]
+  profileViews ProviderProfileView[]
+  serviceAreas ProviderServiceArea[]
+  categories   ProviderCategory[]
+  requestMatches RequestProviderMatch[]
+  offers         Offer[]
+  listings       Listing[]
+  conversations  Conversation[]
+  orders         Order[]
+  balanceEntries ProviderBalance[]
+  payouts        Payout[]
+  reviews        Review[]
+  favoritedBy    Favorite[]
+
+  @@map("providers")
+}
+
+model ProviderProfileView {
+  id         String   @id @default(cuid())
+  providerId String   @map("provider_id")
+  viewerId   String?  @map("viewer_id")
+  ipHash     String?  @map("ip_hash")
+  userAgent  String?  @map("user_agent") @db.VarChar(255)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([viewerId])
+  @@index([createdAt])
+  @@map("provider_profile_views")
+}
+
+model ProviderFaq {
+  id         String   @id @default(cuid())
+  providerId String   @map("provider_id")
+  question   String
+  answer     String   @db.Text
+  sortOrder  Int      @default(0) @map("sort_order")
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@map("provider_faqs")
+}
+
+model ProviderDocument {
+  id         String       @id @default(cuid())
+  providerId String       @map("provider_id")
+  type       DocumentType @default(OTHER)
+  fileUrl    String       @map("file_url")
+  fileName   String?      @map("file_name")
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@map("provider_documents")
+}
+
+model ProviderServiceArea {
+  id         String  @id @default(cuid())
+  providerId String  @map("provider_id")
+  city       String
+  district   String?
+  latitude   Float?
+  longitude  Float?
+  radiusKm   Int     @default(20) @map("radius_km")
+  isActive   Boolean @default(true) @map("is_active")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@map("provider_service_areas")
+}
+
+model ProviderCategory {
+  id           String @id @default(cuid())
+  providerId   String @map("provider_id")
+  categorySlug String @map("category_slug")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, categorySlug])
+  @@map("provider_categories")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model Category {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  icon          String?
+  coverImageUrl String?  @map("cover_image_url")
+  description   String?  @db.Text
+  sortOrder     Int      @default(0) @map("sort_order")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  services Service[]
+  requests ServiceRequest[]
+  listings Listing[]
+
+  @@map("categories")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  categoryId  String   @map("category_id")
+  slug        String
+  name        String
+  description String?  @db.Text
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  requests      ServiceRequest[]
+  homepageItems HomepageItem[]
+
+  @@unique([categoryId, slug])
+  @@map("services")
+}
+
+model ServiceRequest {
+  id             String        @id @default(cuid())
+  customerId     String        @map("customer_id")
+  categoryId     String        @map("category_id")
+  serviceId      String?       @map("service_id")
+  description    String        @db.Text
+  status         RequestStatus @default(OPEN)
+  city           String
+  district       String?
+  neighborhood   String?
+  addressDetail  String?       @map("address_detail") @db.Text
+  latitude       Float
+  longitude      Float
+  preferredDate  DateTime?     @map("preferred_date") @db.Date
+  preferredTime  String?       @map("preferred_time")
+  urgency        String        @default("normal")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  customer User                   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  category Category               @relation(fields: [categoryId], references: [id])
+  service  Service?               @relation(fields: [serviceId], references: [id])
+  images   RequestImage[]
+  matches  RequestProviderMatch[]
+  offers   Offer[]
+
+  @@index([customerId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("requests")
+}
+
+model RequestImage {
+  id        String   @id @default(cuid())
+  requestId String   @map("request_id")
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("request_images")
+}
+
+model RequestProviderMatch {
+  id          String   @id @default(cuid())
+  requestId   String   @map("request_id")
+  providerId  String   @map("provider_id")
+  distanceKm  Float    @map("distance_km")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  request  ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  provider Provider         @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, providerId])
+  @@map("request_provider_matches")
+}
+
+model Offer {
+  id                String      @id @default(cuid())
+  requestId         String      @map("request_id")
+  providerId        String      @map("provider_id")
+  price             Float
+  description       String      @db.Text
+  estimatedDuration String?     @map("estimated_duration")
+  proposedDate      DateTime?   @map("proposed_date")
+  status            OfferStatus @default(PENDING)
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  request  ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  provider Provider       @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  orders   Order[]
+
+  @@unique([requestId, providerId])
+  @@index([requestId])
+  @@index([providerId])
+  @@index([status])
+  @@map("offers")
+}
+
+model Listing {
+  id              String        @id @default(cuid())
+  providerId      String        @map("provider_id")
+  categoryId      String        @map("category_id")
+  title           String
+  description     String        @db.Text
+  price           Float
+  city            String
+  district        String?
+  latitude        Float
+  longitude       Float
+  serviceRadiusKm Int           @default(20) @map("service_radius_km")
+  status          ListingStatus @default(PENDING)
+  rejectedReason  String?       @map("rejected_reason") @db.Text
+  approvedAt      DateTime?     @map("approved_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  provider Provider       @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  category Category       @relation(fields: [categoryId], references: [id])
+  images   ListingImage[]
+  conversations Conversation[]
+  orders        Order[]
+  homepageItems HomepageItem[]
+
+  @@index([providerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([city])
+  @@map("listings")
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String   @map("listing_id")
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_images")
+}
+
+model Conversation {
+  id            String    @id @default(cuid())
+  customerId    String    @map("customer_id")
+  providerId    String    @map("provider_id")
+  listingId     String?   @map("listing_id")
+  lastMessageAt DateTime? @map("last_message_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  customer      User          @relation("CustomerConversations", fields: [customerId], references: [id], onDelete: Cascade)
+  provider      Provider      @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  listing       Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  messages      Message[]
+  privateOffers PrivateOffer[]
+
+  @@unique([customerId, providerId])
+  @@index([customerId])
+  @@index([providerId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String      @map("conversation_id")
+  senderId       String      @map("sender_id")
+  type           MessageType @default(TEXT)
+  body           String?     @db.Text
+  readAt         DateTime?   @map("read_at")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  conversation Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  privateOffer PrivateOffer?
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model PrivateOffer {
+  id             String             @id @default(cuid())
+  conversationId String             @map("conversation_id")
+  messageId      String             @unique @map("message_id")
+  title          String             @default("Özel teklif")
+  price          Float
+  description    String             @db.Text
+  scheduledAt    DateTime?          @map("scheduled_at")
+  durationHours  Int?               @map("duration_hours")
+  warrantyNote   String?            @map("warranty_note") @db.Text
+  status         PrivateOfferStatus @default(PENDING)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  orders       Order[]
+
+  @@index([conversationId])
+  @@map("private_offers")
+}
+
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
+
+enum HomepageItemType {
+  FEATURED_SERVICE
+  STAT
+  TESTIMONIAL
+  HOW_IT_WORKS_STEP
+}
+
+model HomepageConfig {
+  id String @id @default("default")
+
+  heroBadge             String @default("ProfUsta güvencesiyle") @map("hero_badge")
+  heroTitle             String @db.Text @map("hero_title")
+  heroSubtitle          String @db.Text @map("hero_subtitle")
+  heroImageUrl          String @default("/hero.png") @map("hero_image_url")
+  heroSearchPlaceholder String @default("Hangi hizmete ihtiyacınız var?") @map("hero_search_placeholder")
+  heroRating            String @default("4.9 / 5") @map("hero_rating")
+  heroRatingLabel       String @default("10.000+ mutlu müşteri") @map("hero_rating_label")
+  heroPrimaryCtaLabel   String @default("Hemen Teklif Al") @map("hero_primary_cta_label")
+  heroPrimaryCtaHref    String @default("/talep-olustur") @map("hero_primary_cta_href")
+  heroSecondaryCtaLabel String @default("Ustaları Keşfet") @map("hero_secondary_cta_label")
+  heroSecondaryCtaHref  String @default("/ustalar") @map("hero_secondary_cta_href")
+
+  popularServicesEyebrow   String @default("Hizmetler") @map("popular_services_eyebrow")
+  popularServicesTitle     String @default("Popüler Hizmetler") @map("popular_services_title")
+  popularServicesSubtitle  String @default("En çok tercih edilen hizmetlere göz atın.") @map("popular_services_subtitle")
+  popularServicesCtaLabel  String @default("Tüm Hizmetleri Gör") @map("popular_services_cta_label")
+  popularServicesCtaHref   String @default("/hizmetler") @map("popular_services_cta_href")
+  popularServicesLimit   Int    @default(8) @map("popular_services_limit")
+
+  categoriesEyebrow  String @default("Kategoriler") @map("categories_eyebrow")
+  categoriesTitle    String @default("Popüler Hizmet Kategorileri") @map("categories_title")
+  categoriesSubtitle String @default("İhtiyacınıza uygun hizmet kategorisini seçin.") @map("categories_subtitle")
+  categoriesCtaLabel String @default("Tüm Kategorileri Gör") @map("categories_cta_label")
+  categoriesCtaHref  String @default("/hizmetler") @map("categories_cta_href")
+  categoriesLimit    Int    @default(8) @map("categories_limit")
+
+  guaranteeTitle String @default("Güvencemizle Hizmet Alın") @map("guarantee_title")
+  guaranteeText  String @db.Text @map("guarantee_text")
+
+  reviewsEyebrow  String @default("Yorumlar") @map("reviews_eyebrow")
+  reviewsTitle    String @default("Müşterilerimiz Ne Diyor?") @map("reviews_title")
+  reviewsSubtitle String @default("Gerçek müşterilerimizin gerçek yorumları") @map("reviews_subtitle")
+
+  howItWorksEyebrow  String @default("Süreç") @map("how_it_works_eyebrow")
+  howItWorksTitle    String @default("Nasıl Çalışır?") @map("how_it_works_title")
+  howItWorksSubtitle String @default("Dört basit adımda işinizi güvenle tamamlayın.") @map("how_it_works_subtitle")
+  howItWorksCtaLabel String @default("Detaylı incele") @map("how_it_works_cta_label")
+  howItWorksCtaHref  String @default("/nasil-calisir") @map("how_it_works_cta_href")
+
+  mobileTitle    String @db.Text @map("mobile_title")
+  mobileText     String @db.Text @map("mobile_text")
+  mobileImageUrl String @default("/mobil.png") @map("mobile_image_url")
+
+  ctaEyebrow         String @default("ProfUsta güvencesi") @map("cta_eyebrow")
+  ctaTitle           String @default("Hizmete mi ihtiyacınız var?") @map("cta_title")
+  ctaText            String @db.Text @map("cta_text")
+  ctaPrimaryLabel    String @default("Hemen Teklif Al") @map("cta_primary_label")
+  ctaPrimaryHref     String @default("/talep-olustur") @map("cta_primary_href")
+  ctaSecondaryLabel  String @default("Usta Olarak Katıl") @map("cta_secondary_label")
+  ctaSecondaryHref   String @default("/usta-basvuru") @map("cta_secondary_href")
+
+  showHero            Boolean @default(true) @map("show_hero")
+  showPopularServices Boolean @default(true) @map("show_popular_services")
+  showCategories      Boolean @default(true) @map("show_categories")
+  showReviews         Boolean @default(true) @map("show_reviews")
+  showMobileBanner    Boolean @default(true) @map("show_mobile_banner")
+  showHowItWorks      Boolean @default(true) @map("show_how_it_works")
+  showBottomCta       Boolean @default(true) @map("show_bottom_cta")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_config")
+}
+
+model HomepageItem {
+  id          String           @id @default(cuid())
+  type        HomepageItemType
+  sortOrder   Int              @default(0) @map("sort_order")
+  isActive    Boolean          @default(true) @map("is_active")
+  title       String?
+  subtitle    String?
+  description String?          @db.Text
+  body        String?          @db.Text
+  priceLabel  String?          @map("price_label")
+  icon        String?
+  href        String?
+  stepNumber  String?          @map("step_number")
+  bullets     Json?
+  rating      Int?
+  serviceId   String?          @map("service_id")
+  listingId   String?          @map("listing_id")
+  imageUrl    String?          @map("image_url")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  @@index([type, sortOrder])
+  @@map("homepage_items")
+}
+
+model Order {
+  id               String          @id @default(cuid())
+  merchantOid      String          @unique @map("merchant_oid")
+  customerId       String          @map("customer_id")
+  providerId       String          @map("provider_id")
+  sourceType       OrderSourceType @map("source_type")
+  sourceId         String          @map("source_id")
+  requestOfferId   String?         @map("request_offer_id")
+  privateOfferId   String?         @map("private_offer_id")
+  listingId        String?         @map("listing_id")
+  title            String
+  description      String          @db.Text
+  amount           Float
+  discountAmount   Float           @default(0) @map("discount_amount")
+  couponId         String?         @map("coupon_id")
+  couponCode       String?         @map("coupon_code")
+  commissionRate   Float           @map("commission_rate")
+  commissionAmount Float           @map("commission_amount")
+  netAmount        Float           @map("net_amount")
+  status           OrderStatus     @default(PENDING_PAYMENT)
+  paidAt                DateTime?       @map("paid_at")
+  providerCompletedAt DateTime?       @map("provider_completed_at")
+  completedAt           DateTime?       @map("completed_at")
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+
+  customer       User            @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  provider       Provider        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  requestOffer   Offer?          @relation(fields: [requestOfferId], references: [id], onDelete: SetNull)
+  privateOffer   PrivateOffer?   @relation(fields: [privateOfferId], references: [id], onDelete: SetNull)
+  listing        Listing?        @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  payments       Payment[]
+  balanceEntries ProviderBalance[]
+  review         Review?
+  refunds        Refund[]
+  disputes       Dispute[]
+
+  @@index([customerId])
+  @@index([providerCompletedAt])
+  @@index([providerId])
+  @@index([status])
+  @@index([sourceType, sourceId])
+  @@map("orders")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @map("order_id")
+  merchantOid       String        @unique @map("merchant_oid")
+  status            PaymentStatus @default(PENDING)
+  totalAmountKurus  Int           @map("total_amount_kurus")
+  checkoutToken     String?       @map("checkout_token") @db.VarChar(512)
+  providerPaymentId String?       @map("provider_payment_id")
+  failedReason      String?       @map("failed_reason") @db.Text
+  rawPayload        String?       @map("raw_payload") @db.Text
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+model ProviderBalance {
+  id         String           @id @default(cuid())
+  providerId String           @map("provider_id")
+  orderId    String?          @map("order_id")
+  type       BalanceEntryType
+  amount     Float
+  note       String?          @db.Text
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  order    Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([providerId])
+  @@map("provider_balances")
+}
+
+model Payout {
+  id         String       @id @default(cuid())
+  providerId String       @map("provider_id")
+  amount     Float
+  iban       String
+  status     PayoutStatus @default(PENDING)
+  adminNote  String?      @map("admin_note") @db.Text
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([status])
+  @@map("payouts")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orderId    String   @unique @map("order_id")
+  customerId String   @map("customer_id")
+  providerId String   @map("provider_id")
+  rating     Int
+  comment    String   @db.Text
+  isVisible  Boolean  @default(true) @map("is_visible")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User     @relation("CustomerReviews", fields: [customerId], references: [id], onDelete: Cascade)
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([customerId])
+  @@map("reviews")
+}
+
+model Refund {
+  id          String            @id @default(cuid())
+  orderId     String            @map("order_id")
+  requestedBy RefundRequestedBy @map("requested_by")
+  scenario    RefundScenario
+  reason      String            @db.Text
+  amount      Float?
+  status      RefundStatus      @default(PENDING)
+  adminNote   String?           @map("admin_note") @db.Text
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+  @@map("refunds")
+}
+
+model Dispute {
+  id               String        @id @default(cuid())
+  orderId          String        @map("order_id")
+  customerId       String        @map("customer_id")
+  description      String        @db.Text
+  status           DisputeStatus @default(OPEN)
+  phase            DisputePhase  @default(AWAITING_PROVIDER)
+  adminDecision    String?       @map("admin_decision")
+  refundAmount     Float?        @map("refund_amount")
+  providerResponse String?       @map("provider_response") @db.Text
+  resolvedAt       DateTime?     @map("resolved_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  order    Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  events   DisputeEvent[]
+
+  @@index([orderId])
+  @@index([status])
+  @@map("disputes")
+}
+
+model DisputeEvent {
+  id        String           @id @default(cuid())
+  disputeId String           @map("dispute_id")
+  actorRole DisputeActorRole @map("actor_role")
+  actorId   String?          @map("actor_id")
+  type      DisputeEventType @map("type")
+  message   String           @db.Text
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId])
+  @@map("dispute_events")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  link      String?
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  customerId String   @map("customer_id")
+  providerId String   @map("provider_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  customer User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, providerId])
+  @@index([customerId])
+  @@map("favorites")
+}
+
+model Coupon {
+  id             String             @id @default(cuid())
+  code           String             @unique
+  description    String?            @db.Text
+  discountType   CouponDiscountType @map("discount_type")
+  discountValue  Float              @map("discount_value")
+  minOrderAmount Float?             @map("min_order_amount")
+  maxUses        Int?               @map("max_uses")
+  usedCount      Int                @default(0) @map("used_count")
+  validFrom      DateTime?          @map("valid_from")
+  validUntil     DateTime?          @map("valid_until")
+  isActive       Boolean            @default(true) @map("is_active")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  @@map("coupons")
+}
+
+model AdminLog {
+  id         String   @id @default(cuid())
+  adminId    String   @map("admin_id")
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  details    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  admin User @relation("AdminLogs", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([createdAt])
+  @@map("admin_logs")
+}
