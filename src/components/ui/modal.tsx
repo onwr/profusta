@@ -11,7 +11,7 @@ type ModalProps = {
   title: string;
   description?: string;
   children: React.ReactNode;
-  size?: "md" | "lg" | "xl";
+  size?: "md" | "lg" | "xl" | "2xl";
   footer?: React.ReactNode;
 };
 
@@ -19,6 +19,7 @@ const sizeClass = {
   md: "max-w-lg",
   lg: "max-w-2xl",
   xl: "max-w-4xl",
+  "2xl": "max-w-6xl",
 };
 
 export function Modal({

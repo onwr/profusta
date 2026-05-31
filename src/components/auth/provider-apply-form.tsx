@@ -6,11 +6,27 @@ import { useEffect, useState } from "react";
 import { Upload } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { FormField, inputClassName } from "@/components/auth/form-field";
+import {
+  CategoryPicker,
+  type CategoryPickerItem,
+} from "@/components/category/category-picker";
 import { CityDistrictSelect } from "@/components/geo/city-district-select";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 import { useUserLocation } from "@/hooks/use-user-location";
 import { cn } from "@/lib/utils";
+import {
+  isValidTurkishIban,
+  normalizeIban,
+  sanitizeIbanInput,
+  TURKISH_IBAN_FORMAT_HINT,
+} from "@/lib/validations/iban";
+import {
+  isValidTurkishPhone,
+  normalizeTurkishPhone,
+  sanitizeTurkishPhoneInput,
+  TURKISH_PHONE_FORMAT_HINT,
+} from "@/lib/validations/phone";
 
 export function ProviderApplyForm() {
   const router = useRouter();
@@ -19,18 +35,39 @@ export function ProviderApplyForm() {
   const [loading, setLoading] = useState(false);
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
-  const [categoryOptions, setCategoryOptions] = useState<
-    { slug: string; name: string }[]
-  >([]);
+  const [phone, setPhone] = useState("");
+  const [iban, setIban] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [ibanError, setIbanError] = useState("");
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoryInvalid, setCategoryInvalid] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryPickerItem[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/categories")
       .then((r) => r.json())
       .then((data) => {
-        const list = (data.categories ?? []) as { slug: string; name: string }[];
-        setCategoryOptions(list.map((c) => ({ slug: c.slug, name: c.name })));
-      });
+        const list = (data.categories ?? []) as {
+          slug: string;
+          name: string;
+          icon: string | null;
+          description: string | null;
+          coverImageUrl: string | null;
+          _count?: { services: number };
+        }[];
+        setCategoryOptions(
+          list.map((c) => ({
+            slug: c.slug,
+            name: c.name,
+            icon: c.icon,
+            description: c.description,
+            coverImageUrl: c.coverImageUrl,
+            serviceCount: c._count?.services ?? 0,
+          })),
+        );
+      })
+      .finally(() => setCategoriesLoading(false));
   }, []);
 
   useEffect(() => {
@@ -40,10 +77,70 @@ export function ProviderApplyForm() {
     }
   }, [initialized, location, city]);
 
-  function toggleCategory(slug: string) {
-    setSelectedCategories((prev) =>
-      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug],
+
+  function handlePhoneChange(raw: string) {
+    const formatted = sanitizeTurkishPhoneInput(raw);
+    setPhone(formatted);
+    const digits = normalizeTurkishPhone(formatted);
+    if (!digits) {
+      setPhoneError("");
+      return;
+    }
+    if (digits.length < 11) {
+      setPhoneError("");
+      return;
+    }
+    setPhoneError(
+      isValidTurkishPhone(formatted)
+        ? ""
+        : `Geçerli bir cep telefonu girin (örn. ${TURKISH_PHONE_FORMAT_HINT})`,
     );
+  }
+
+  function handleIbanChange(raw: string) {
+    const formatted = sanitizeIbanInput(raw);
+    setIban(formatted);
+    if (!formatted.trim()) {
+      setIbanError("");
+      return;
+    }
+    setIbanError(
+      isValidTurkishIban(formatted)
+        ? ""
+        : `Geçerli bir TR IBAN girin (örn. ${TURKISH_IBAN_FORMAT_HINT})`,
+    );
+  }
+
+  function validatePhoneField(): boolean {
+    const digits = normalizeTurkishPhone(phone);
+    if (!digits) {
+      setPhoneError("Telefon numarası gerekli");
+      return false;
+    }
+    if (!isValidTurkishPhone(phone)) {
+      setPhoneError(
+        `Geçerli bir cep telefonu girin (örn. ${TURKISH_PHONE_FORMAT_HINT})`,
+      );
+      return false;
+    }
+    setPhoneError("");
+    return true;
+  }
+
+  function validateIbanField(): boolean {
+    const normalized = normalizeIban(iban);
+    if (!normalized) {
+      setIbanError("");
+      return true;
+    }
+    if (!isValidTurkishIban(normalized)) {
+      setIbanError(
+        `Geçerli bir TR IBAN girin (örn. ${TURKISH_IBAN_FORMAT_HINT})`,
+      );
+      return false;
+    }
+    setIbanError("");
+    return true;
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -56,28 +153,31 @@ export function ProviderApplyForm() {
     }
 
     if (selectedCategories.length === 0) {
+      setCategoryInvalid(true);
       setError("En az bir hizmet kategorisi seçin");
+      return;
+    }
+
+    setCategoryInvalid(false);
+
+    if (!validatePhoneField() || !validateIbanField()) {
       return;
     }
 
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-
     const bioRaw = form.get("bio");
-    const ibanRaw = form.get("iban");
+    const ibanNormalized = normalizeIban(iban);
 
     const payload = {
-      fullName: String(form.get("fullName") ?? ""),
-      email: String(form.get("email") ?? ""),
-      phone: String(form.get("phone") ?? ""),
+      fullName: String(form.get("fullName") ?? "").trim(),
+      email: String(form.get("email") ?? "").trim(),
+      phone: normalizeTurkishPhone(phone),
       password: String(form.get("password") ?? ""),
       bio:
         typeof bioRaw === "string" && bioRaw.trim() ? bioRaw.trim() : undefined,
-      iban:
-        typeof ibanRaw === "string" && ibanRaw.trim()
-          ? ibanRaw.trim()
-          : undefined,
+      iban: ibanNormalized || undefined,
       baseCity: city,
       baseDistrict: district,
       serviceRadiusKm: Number(form.get("serviceRadiusKm") ?? 20),
@@ -113,6 +213,11 @@ export function ProviderApplyForm() {
     }
   }
 
+  const phoneValid =
+    normalizeTurkishPhone(phone).length === 11 && isValidTurkishPhone(phone);
+  const ibanValid =
+    iban.trim().length > 0 && isValidTurkishIban(iban) && !ibanError;
+
   return (
     <AuthCard
       title="Usta Başvurusu"
@@ -135,7 +240,36 @@ export function ProviderApplyForm() {
           <input name="email" type="email" required className={inputClassName} />
         </FormField>
         <FormField label="Telefon">
-          <input name="phone" type="tel" required className={inputClassName} />
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            required
+            value={phone}
+            onChange={(e) => handlePhoneChange(e.target.value)}
+            onBlur={validatePhoneField}
+            placeholder={TURKISH_PHONE_FORMAT_HINT}
+            aria-invalid={Boolean(phoneError)}
+            aria-describedby={phoneError ? "phone-error" : undefined}
+            className={cn(
+              inputClassName,
+              "tracking-wide",
+              phoneError && "border-red-400 focus:border-red-400 focus:ring-red-200",
+            )}
+          />
+          {phoneError ? (
+            <p id="phone-error" className="mt-1.5 text-xs font-semibold text-red-600">
+              {phoneError}
+            </p>
+          ) : phoneValid ? (
+            <p className="mt-1.5 text-xs font-semibold text-[#10b981]">
+              Telefon formatı geçerli
+            </p>
+          ) : (
+            <p className="mt-1.5 text-xs text-[#53635f]">
+              Cep telefonu formatı: {TURKISH_PHONE_FORMAT_HINT}
+            </p>
+          )}
         </FormField>
         <FormField label="Şifre">
           <input
@@ -170,28 +304,50 @@ export function ProviderApplyForm() {
           />
         </FormField>
 
-        <FormField label="Hizmet kategorileri">
-          <div className="flex flex-wrap gap-2">
-            {categoryOptions.map((cat) => (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => toggleCategory(cat.slug)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                  selectedCategories.includes(cat.slug)
-                    ? "bg-[#087a61] text-white"
-                    : "bg-[#eef8f5] text-[#083228] hover:bg-[#d9f0ea]",
-                )}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        </FormField>
+        <CategoryPicker
+          categories={categoryOptions}
+          selected={selectedCategories}
+          onChange={(slugs) => {
+            setCategoryInvalid(false);
+            setSelectedCategories(slugs);
+          }}
+          loading={categoriesLoading}
+          invalid={categoryInvalid}
+        />
 
         <FormField label="IBAN (opsiyonel)">
-          <input name="iban" className={inputClassName} />
+          <input
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            spellCheck={false}
+            value={iban}
+            onChange={(e) => handleIbanChange(e.target.value)}
+            onBlur={() => {
+              if (iban.trim()) validateIbanField();
+            }}
+            placeholder={TURKISH_IBAN_FORMAT_HINT}
+            aria-invalid={Boolean(ibanError)}
+            aria-describedby={ibanError ? "iban-error" : undefined}
+            className={cn(
+              inputClassName,
+              "font-mono tracking-wide",
+              ibanError && "border-red-400 focus:border-red-400 focus:ring-red-200",
+            )}
+          />
+          {ibanError ? (
+            <p id="iban-error" className="mt-1.5 text-xs font-semibold text-red-600">
+              {ibanError}
+            </p>
+          ) : ibanValid ? (
+            <p className="mt-1.5 text-xs font-semibold text-[#10b981]">
+              IBAN formatı geçerli
+            </p>
+          ) : (
+            <p className="mt-1.5 text-xs text-[#53635f]">
+              Ödeme hesabı için TR IBAN: {TURKISH_IBAN_FORMAT_HINT}
+            </p>
+          )}
         </FormField>
         <FormField label="Hakkınızda (opsiyonel)">
           <textarea name="bio" rows={3} className={inputClassName} />
@@ -214,7 +370,11 @@ export function ProviderApplyForm() {
           </p>
         ) : null}
 
-        <Button type="submit" disabled={loading} className="w-full">
+        <Button
+          type="submit"
+          disabled={loading || Boolean(phoneError) || Boolean(ibanError)}
+          className="w-full"
+        >
           {loading ? "Gönderiliyor..." : "Başvuruyu Gönder"}
         </Button>
       </form>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { optionalTurkishIbanSchema } from "@/lib/validations/iban";
+import { turkishPhoneSchema } from "@/lib/validations/phone";
 
 export const loginSchema = z.object({
   email: z.email("Geçerli bir e-posta girin"),
@@ -21,8 +22,9 @@ export const registerSchema = z.object({
 });
 
 export const providerRegisterSchema = registerSchema
-  .omit({ city: true, district: true })
+  .omit({ city: true, district: true, phone: true })
   .extend({
+  phone: turkishPhoneSchema,
   bio: z.string().max(1000).optional(),
   iban: optionalTurkishIbanSchema,
   baseCity: z.string().min(1, "İl seçin"),
