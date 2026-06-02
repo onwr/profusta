@@ -1,9 +1,9 @@
 import { HomeCta } from "@/components/home/HomeCta";
+import { HomeGuaranteeStats } from "@/components/home/HomeGuaranteeStats";
+import { CategoryServiceBrowser } from "@/components/home/CategoryServiceBrowser";
 import { HomeHero } from "@/components/home/Hero";
 import { HowItWorks } from "@/components/home/HowItWorks";
-import { MobileAppBanner } from "@/components/home/MobileAppBanner";
 import { PopularCategories } from "@/components/home/PopularCategories";
-import { PopularServices } from "@/components/home/PopulerServices";
 import { CustomerReviews } from "@/components/home/CustomerReviews";
 import { getHomepageContent } from "@/lib/homepage/get-homepage-content";
 
@@ -15,50 +15,12 @@ export default async function HomePage() {
     <>
       {config.showHero ? <HomeHero hero={config} /> : null}
       {config.showPopularServices ? (
-        <PopularServices
+        <CategoryServiceBrowser
+          categories={content.categoryBrowser}
           section={{
             eyebrow: config.popularServicesEyebrow,
             title: config.popularServicesTitle,
             subtitle: config.popularServicesSubtitle,
-            ctaLabel: config.popularServicesCtaLabel,
-            ctaHref: config.popularServicesCtaHref,
-          }}
-          items={content.featuredServices}
-        />
-      ) : null}
-      {config.showCategories ? (
-        <PopularCategories
-          categories={content.categories}
-          section={{
-            eyebrow: config.categoriesEyebrow,
-            title: config.categoriesTitle,
-            subtitle: config.categoriesSubtitle,
-            ctaLabel: config.categoriesCtaLabel,
-            ctaHref: config.categoriesCtaHref,
-          }}
-          guarantee={{
-            title: config.guaranteeTitle,
-            text: config.guaranteeText,
-          }}
-          stats={content.stats}
-        />
-      ) : null}
-      {config.showReviews ? (
-        <CustomerReviews
-          section={{
-            eyebrow: config.reviewsEyebrow,
-            title: config.reviewsTitle,
-            subtitle: config.reviewsSubtitle,
-          }}
-          testimonials={content.testimonials}
-        />
-      ) : null}
-      {config.showMobileBanner ? (
-        <MobileAppBanner
-          banner={{
-            title: config.mobileTitle,
-            text: config.mobileText,
-            imageUrl: config.mobileImageUrl,
           }}
         />
       ) : null}
@@ -74,6 +36,18 @@ export default async function HomePage() {
           steps={content.howItWorksSteps}
         />
       ) : null}
+      {config.showCategories ? (
+        <PopularCategories
+          categories={content.categories}
+          section={{
+            eyebrow: config.categoriesEyebrow,
+            title: config.categoriesTitle,
+            subtitle: config.categoriesSubtitle,
+            ctaLabel: config.categoriesCtaLabel,
+            ctaHref: config.categoriesCtaHref,
+          }}
+        />
+      ) : null}
       {config.showBottomCta ? (
         <HomeCta
           cta={{
@@ -85,6 +59,24 @@ export default async function HomePage() {
             secondaryLabel: config.ctaSecondaryLabel,
             secondaryHref: config.ctaSecondaryHref,
           }}
+        />
+      ) : null}
+      <HomeGuaranteeStats
+        compactTop={config.showBottomCta}
+        guarantee={{
+          title: config.guaranteeTitle,
+          text: config.guaranteeText,
+        }}
+        stats={content.stats}
+      />
+      {config.showReviews ? (
+        <CustomerReviews
+          section={{
+            eyebrow: config.reviewsEyebrow,
+            title: config.reviewsTitle,
+            subtitle: config.reviewsSubtitle,
+          }}
+          testimonials={content.testimonials}
         />
       ) : null}
     </>

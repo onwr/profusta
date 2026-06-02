@@ -1,9 +1,9 @@
-import { BrandLoader } from "@/components/layout/loading-brand";
+import { PageLoadingShell } from "@/components/layout/page-loading-shell";
 
 export default function Loading() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center bg-[#f7f7f3] py-16">
-      <BrandLoader />
+    <div className="min-h-[60vh] bg-[#f7f7f3]">
+      <PageLoadingShell />
     </div>
   );
 }

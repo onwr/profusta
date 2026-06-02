@@ -5,12 +5,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HomepageItemManager } from "@/components/admin/homepage-item-manager";
 import type { HomepageConfigData, HomepageItemData } from "@/lib/homepage/defaults";
-import type { HomepagePickerOption } from "@/lib/homepage/get-homepage-content";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { id: "hero", label: "Hero" },
-  { id: "services", label: "Popüler Hizmetler" },
+  { id: "services", label: "Hizmet Gezgini" },
   { id: "sections", label: "Bölüm Metinleri" },
   { id: "stats", label: "İstatistikler" },
   { id: "testimonials", label: "Vitrin Yorumları" },
@@ -23,20 +22,15 @@ type TabId = (typeof TABS)[number]["id"];
 export function HomepageAdminManager({
   initialConfig,
   initialItems,
-  pickers,
-  manualFeatured,
 }: {
   initialConfig: HomepageConfigData;
   initialItems: HomepageItemData[];
-  pickers: HomepagePickerOption;
-  manualFeatured: boolean;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("hero");
   const [config, setConfig] = useState(initialConfig);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resettingFeatured, setResettingFeatured] = useState(false);
   const [uploading, setUploading] = useState<"hero" | "mobile" | null>(null);
 
   async function saveConfig(patch: Partial<HomepageConfigData>) {
@@ -183,96 +177,25 @@ export function HomepageAdminManager({
       ) : null}
 
       {tab === "services" ? (
-        <div className="space-y-4">
-          {manualFeatured ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-[#53635f]">
-              <p className="font-bold text-[#083228]">Manuel mod</p>
-              <p className="mt-1">
-                Aşağıdaki kartlar anasayfada gösterilir. Otomatik kategori
-                listesine dönmek için tüm manuel kartları silin.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-3 h-9 text-xs"
-                disabled={resettingFeatured}
-                onClick={async () => {
-                  if (
-                    !confirm(
-                      "Tüm manuel popüler hizmet kartları silinsin mi? Anasayfa aktif kategorilerden otomatik üretilecek.",
-                    )
-                  ) {
-                    return;
-                  }
-                  setResettingFeatured(true);
-                  const res = await fetch(
-                    "/api/admin/homepage/featured/reset",
-                    { method: "POST" },
-                  );
-                  setResettingFeatured(false);
-                  if (res.ok) router.refresh();
-                }}
-              >
-                {resettingFeatured
-                  ? "Siliniyor…"
-                  : "Otomatik moda dön (tüm kartları sil)"}
-              </Button>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-[#087a61]/20 bg-[#f8fcfa] p-4 text-sm text-[#53635f]">
-              <p className="font-bold text-[#083228]">Otomatik mod</p>
-              <p className="mt-1">
-                Kartlar aktif kategorilerden üretilir (kapak görseli ve aktif
-                ilan sayısına göre sıralanır). Kategori kapakları ve en düşük
-                ilan fiyatı otomatik kullanılır.
-              </p>
-              <p className="mt-2 text-xs">
-                Kart sayısı: Bölüm Metinleri → &quot;Gösterilecek popüler hizmet
-                sayısı&quot;. Manuel kart ekleyerek özelleştirebilirsiniz.
-              </p>
-            </div>
-          )}
-          <HomepageItemManager
-            type="FEATURED_SERVICE"
-            items={initialItems}
-            pickers={pickers}
-            readOnlyIdsPrefix="dynamic-category-"
-            labels={{
-              create: "Manuel popüler hizmet kartı ekle",
-              title: "Başlık (boş bırakılırsa ilan/hizmetten alınır)",
-              subtitle: "Rozet (ör. kategori adı)",
-              description: "Açıklama",
-              priceLabel:
-                "Fiyat etiketi (boş bırakın — kategorideki en düşük ilan fiyatı kullanılır)",
-            }}
-            showIcon
-            showHref
-            showPrice
-            showFeaturedPickers
-          />
-        </div>
-      ) : null}
-
-      {tab === "sections" ? (
         <ConfigForm onSubmit={handleSubmit}>
-          <SectionBlock title="Popüler Hizmetler">
+          <p className="text-sm text-[#53635f]">
+            Kategori şeridi ve alt hizmet kartları otomatik olarak tüm aktif
+            kategorilerden üretilir. Metinleri buradan düzenleyin.
+          </p>
+          <SectionBlock title="Hizmet gezgini">
             <SectionFields
               config={config}
               setConfig={setConfig}
               prefix="popularServices"
-            />
-            <TextField
-              label="Gösterilecek popüler hizmet sayısı (otomatik mod)"
-              type="number"
-              value={String(config.popularServicesLimit)}
-              onChange={(v) =>
-                setConfig((c) => ({
-                  ...c,
-                  popularServicesLimit: Math.max(1, Math.min(24, Number(v) || 8)),
-                }))
-              }
+              hideCta
             />
           </SectionBlock>
+          <SaveButton loading={loading} />
+        </ConfigForm>
+      ) : null}
+
+      {tab === "sections" ? (
+        <ConfigForm onSubmit={handleSubmit}>
           <SectionBlock title="Kategoriler">
             <SectionFields
               config={config}
@@ -450,7 +373,7 @@ export function HomepageAdminManager({
           {(
             [
               ["showHero", "Hero"],
-              ["showPopularServices", "Popüler Hizmetler"],
+              ["showPopularServices", "Hizmet gezgini"],
               ["showCategories", "Kategoriler"],
               ["showReviews", "Vitrin Yorumları"],
               ["showMobileBanner", "Mobil Banner"],
@@ -516,10 +439,12 @@ function SectionFields({
   config,
   setConfig,
   prefix,
+  hideCta = false,
 }: {
   config: HomepageConfigData;
   setConfig: React.Dispatch<React.SetStateAction<HomepageConfigData>>;
   prefix: "popularServices" | "categories" | "reviews" | "howItWorks";
+  hideCta?: boolean;
 }) {
   const eyebrow = `${prefix}Eyebrow` as keyof HomepageConfigData;
   const title = `${prefix}Title` as keyof HomepageConfigData;
@@ -545,16 +470,20 @@ function SectionFields({
         value={String(config[subtitle])}
         onChange={(v) => setConfig((c) => ({ ...c, [subtitle]: v }))}
       />
-      <TextField
-        label="CTA metni"
-        value={String(config[ctaLabel])}
-        onChange={(v) => setConfig((c) => ({ ...c, [ctaLabel]: v }))}
-      />
-      <TextField
-        label="CTA link"
-        value={String(config[ctaHref])}
-        onChange={(v) => setConfig((c) => ({ ...c, [ctaHref]: v }))}
-      />
+      {hideCta ? null : (
+        <>
+          <TextField
+            label="CTA metni"
+            value={String(config[ctaLabel])}
+            onChange={(v) => setConfig((c) => ({ ...c, [ctaLabel]: v }))}
+          />
+          <TextField
+            label="CTA link"
+            value={String(config[ctaHref])}
+            onChange={(v) => setConfig((c) => ({ ...c, [ctaHref]: v }))}
+          />
+        </>
+      )}
     </div>
   );
 }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { HeaderLocationPicker } from "@/components/layout/header-location-picker";
 import {
   headerBar,
   headerStaggerContainer,
@@ -99,10 +98,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             </motion.div>
           ) : null}
 
-          <motion.div variants={headerStaggerItem} transition={fastTransition}>
-            <HeaderLocationPicker variant="desktop" />
-          </motion.div>
-
           <motion.div
             className="flex items-center gap-3"
             variants={headerStaggerItem}
@@ -142,10 +137,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               initial={initial}
               animate={animate}
             >
-              <motion.div variants={headerStaggerItem} transition={fastTransition}>
-                <HeaderLocationPicker variant="mobile" />
-              </motion.div>
-
               {navItems.map((item) => (
                 <motion.div
                   key={item.href}

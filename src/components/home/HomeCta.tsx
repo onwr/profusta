@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { FadeIn } from "@/components/motion/fade-in";
 import { SectionReveal } from "@/components/motion/section-reveal";
 import { DEFAULT_HOMEPAGE_CONFIG } from "@/lib/homepage/defaults";
@@ -30,14 +30,14 @@ const defaultCta: CtaCopy = {
 export function HomeCta({ cta = defaultCta }: { cta?: CtaCopy }) {
   return (
     <SectionReveal className={`bg-white pb-20 ${homeSectionX}`}>
-      <FadeIn className="relative overflow-hidden rounded-2xl bg-linear-to-r from-[#06291f] via-[#07372b] to-[#041b15] px-5 py-10 sm:rounded-[32px] sm:px-12 sm:py-12 lg:px-16">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#0c8b6f]/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-[#0c8b6f]/15 blur-3xl" />
+      <FadeIn className="relative overflow-hidden rounded-2xl border border-[#e8ecf0] bg-[#0f1419] px-5 py-10 shadow-[0_24px_80px_rgba(15,20,25,0.18)] sm:rounded-[32px] sm:px-12 sm:py-12 lg:px-16">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),transparent_42%),radial-gradient(circle_at_85%_100%,rgba(148,163,184,0.12),transparent_38%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,transparent_48%,rgba(255,255,255,0.02)_100%)]" />
 
         <div className="relative grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[12px] font-black tracking-wide text-white/90">
-              <ShieldCheck className="h-3.5 w-3.5" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[12px] font-bold tracking-wide text-white/80 backdrop-blur-sm">
+              <Sparkles className="h-3.5 w-3.5 text-[#cbd5e1]" />
               {cta.eyebrow}
             </span>
 
@@ -45,7 +45,7 @@ export function HomeCta({ cta = defaultCta }: { cta?: CtaCopy }) {
               {cta.title}
             </h2>
 
-            <p className="mt-4 max-w-[480px] text-[15px] leading-7 text-white/70">
+            <p className="mt-4 max-w-[480px] text-[15px] leading-7 text-[#94a3b8]">
               {cta.text}
             </p>
           </div>
@@ -53,7 +53,7 @@ export function HomeCta({ cta = defaultCta }: { cta?: CtaCopy }) {
           <div className="flex flex-col gap-3 lg:items-end">
             <Link
               href={cta.primaryHref}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 text-sm font-black text-[#06291f] transition hover:bg-[#eef8f5]"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 text-sm font-black text-[#0f1419] shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition hover:bg-[#f8fafc]"
             >
               {cta.primaryLabel}
               <ArrowRight className="h-4 w-4" />
@@ -61,7 +61,7 @@ export function HomeCta({ cta = defaultCta }: { cta?: CtaCopy }) {
 
             <Link
               href={cta.secondaryHref}
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/25 px-7 text-sm font-bold text-white transition hover:bg-white/10"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white/25 hover:bg-white/10"
             >
               {cta.secondaryLabel}
             </Link>

@@ -77,12 +77,11 @@ export type HomepageItemData = {
 
 export const DEFAULT_HOMEPAGE_CONFIG: HomepageConfigData = {
   heroBadge: "ProfUsta güvencesiyle",
-  heroTitle:
-    "Ev işleri için\ngüvenilir\nustalar,\npratik\nçözümler.",
+  heroTitle: "Usta Bulmanın En Kolay Yolu",
   heroSubtitle:
-    "Elektrikten tesisata, mobilya montajından boyaya tüm işlerinizde yanınızdayız.",
+    "Elektrik, tesisat, mobilya montajı, ve onlarca hizmet için doğrulanmış ustalardan teklif alın",
   heroImageUrl: "/hero.png",
-  heroSearchPlaceholder: "Hangi hizmete ihtiyacınız var?",
+  heroSearchPlaceholder: "Elektrikçi, tesisatçı, TV montajı...",
   heroRating: "4.9 / 5",
   heroRatingLabel: "10.000+ mutlu müşteri",
   heroPrimaryCtaLabel: "Hemen Teklif Al",
@@ -90,13 +89,13 @@ export const DEFAULT_HOMEPAGE_CONFIG: HomepageConfigData = {
   heroSecondaryCtaLabel: "Ustaları Keşfet",
   heroSecondaryCtaHref: "/ustalar",
   popularServicesEyebrow: "Hizmetler",
-  popularServicesTitle: "Popüler Hizmetler",
-  popularServicesSubtitle: "En çok tercih edilen hizmetlere göz atın.",
+  popularServicesTitle: "Kategorilerimiz",
+  popularServicesSubtitle: "Kategori seçin, alt hizmetlere göz atın.",
   popularServicesCtaLabel: "Tüm Hizmetleri Gör",
   popularServicesCtaHref: "/hizmetler",
   popularServicesLimit: 8,
   categoriesEyebrow: "Kategoriler",
-  categoriesTitle: "Popüler Hizmet Kategorileri",
+  categoriesTitle: "Kategorilerimiz",
   categoriesSubtitle: "İhtiyacınıza uygun hizmet kategorisini seçin.",
   categoriesCtaLabel: "Tüm Kategorileri Gör",
   categoriesCtaHref: "/hizmetler",

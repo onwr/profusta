@@ -1,10 +1,5 @@
 import type { HomepageItemType } from "@/generated/prisma/client";
-import { getActiveCategories } from "@/lib/categories";
-import { enrichFeaturedServices } from "@/lib/homepage/enrich-featured";
-import {
-  buildDynamicFeaturedServices,
-} from "@/lib/homepage/dynamic-featured";
-import { resolveFeaturedServiceItems } from "@/lib/homepage/resolve-featured";
+import { getActiveCategories, getCategoriesWithServices } from "@/lib/categories";
 import { db } from "@/lib/db";
 import {
   DEFAULT_HOMEPAGE_CONFIG,
@@ -96,33 +91,28 @@ export async function hasManualFeaturedServices(): Promise<boolean> {
 }
 
 export async function getHomepageItemsForAdmin(): Promise<HomepageItemData[]> {
-  const [rows, config] = await Promise.all([
-    db.homepageItem.findMany({
-      orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
-    }),
-    getHomepageConfigForAdmin(),
-  ]);
-
-  const limit = config.popularServicesLimit || config.categoriesLimit || 8;
-  const dynamicFeatured = await buildDynamicFeaturedServices(limit);
+  const rows = await db.homepageItem.findMany({
+    orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
+  });
 
   if (rows.length === 0) {
-    return [...dynamicFeatured, ...mapDefaultItems()];
+    return mapDefaultItems();
   }
 
-  const mapped = rows.map(mapItem);
-  const withoutFeatured = mapped.filter((i) => i.type !== "FEATURED_SERVICE");
-  return [...dynamicFeatured, ...withoutFeatured];
+  return rows
+    .map(mapItem)
+    .filter((i) => i.type !== "FEATURED_SERVICE");
 }
 
 export async function getHomepageContent() {
-  const [configRow, itemRows, categories] = await Promise.all([
+  const [configRow, itemRows, categories, categoryBrowser] = await Promise.all([
     db.homepageConfig.findUnique({ where: { id: "default" } }),
     db.homepageItem.findMany({
       where: { isActive: true },
       orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
     }),
     getActiveCategories(),
+    getCategoriesWithServices(),
   ]);
 
   const config: HomepageConfigData = configRow
@@ -142,27 +132,13 @@ export async function getHomepageContent() {
   const categoriesLimit = config.categoriesLimit || 8;
   const slicedCategories = categories.slice(0, categoriesLimit);
 
-  const categoriesForCovers = categories.map((c) => ({
-    slug: c.slug,
-    name: c.name,
-    coverImageUrl: c.coverImageUrl,
-    icon: c.icon,
-  }));
-
-  const featuredSource = await resolveFeaturedServiceItems(config, cmsItems);
-
-  const featuredServices = await enrichFeaturedServices(
-    featuredSource,
-    categoriesForCovers,
-  );
-
   return {
     config,
-    featuredServices,
     stats: activeByType(cmsItems, "STAT"),
     testimonials: activeByType(cmsItems, "TESTIMONIAL"),
     howItWorksSteps: activeByType(cmsItems, "HOW_IT_WORKS_STEP"),
     categories: slicedCategories,
+    categoryBrowser,
   };
 }
 

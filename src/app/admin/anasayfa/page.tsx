@@ -3,16 +3,12 @@ import { HomepageAdminManager } from "@/components/admin/homepage-admin-manager"
 import {
   getHomepageConfigForAdmin,
   getHomepageItemsForAdmin,
-  getHomepagePickersForAdmin,
-  hasManualFeaturedServices,
 } from "@/lib/homepage/get-homepage-content";
 
 export default async function AdminHomepagePage() {
-  const [config, items, pickers, manualFeatured] = await Promise.all([
+  const [config, items] = await Promise.all([
     getHomepageConfigForAdmin(),
     getHomepageItemsForAdmin(),
-    getHomepagePickersForAdmin(),
-    hasManualFeaturedServices(),
   ]);
 
   return (
@@ -25,8 +21,6 @@ export default async function AdminHomepagePage() {
       <HomepageAdminManager
         initialConfig={config}
         initialItems={items}
-        pickers={pickers}
-        manualFeatured={manualFeatured}
       />
     </div>
   );

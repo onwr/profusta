@@ -2,93 +2,118 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  Headphones,
+  BadgeCheck,
+  Clock,
+  ClipboardCheck,
+  LockKeyhole,
   Search,
   ShieldCheck,
-  Sparkles,
-  Tag,
+  Star,
+  UsersRound,
+  Zap,
 } from "lucide-react";
-import {
-  heroImage,
-  heroStaggerContainer,
-  heroStaggerItem,
-} from "@/lib/motion/variants";
+import { heroStaggerContainer, heroStaggerItem } from "@/lib/motion/variants";
 import { useMotionConfig } from "@/lib/motion/use-motion-config";
 import { ROUTES } from "@/lib/constants";
 import type { HomepageConfigData } from "@/lib/homepage/defaults";
 
 type HeroProps = Pick<
   HomepageConfigData,
-  | "heroBadge"
-  | "heroTitle"
-  | "heroSubtitle"
-  | "heroImageUrl"
-  | "heroSearchPlaceholder"
-  | "heroRating"
-  | "heroRatingLabel"
-  | "heroPrimaryCtaLabel"
-  | "heroPrimaryCtaHref"
-  | "heroSecondaryCtaLabel"
-  | "heroSecondaryCtaHref"
+  "heroTitle" | "heroSubtitle" | "heroImageUrl" | "heroSearchPlaceholder"
 >;
 
 export function HomeHero({ hero }: { hero: HeroProps }) {
-  const { initial, animate, heroTransition } = useMotionConfig();
+  const { initial, animate, heroTransition, reduced } = useMotionConfig();
   const router = useRouter();
   const [query, setQuery] = useState("");
+
   const titleLines = hero.heroTitle.split("\n").filter(Boolean);
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
+
     const trimmed = query.trim();
+
     router.push(
       trimmed
         ? `${ROUTES.categories}?q=${encodeURIComponent(trimmed)}`
-        : ROUTES.categories,
+        : ROUTES.categories
     );
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#f7f7f3]">
-      <div className="grid min-h-[520px] w-full grid-cols-1 items-center lg:grid-cols-[42%_58%]">
+    <section className="relative min-h-[720px] w-full overflow-hidden bg-[#041b15]">
+      <div className="absolute inset-0">
         <motion.div
-          className="relative z-10 py-16 pl-8 pr-6 sm:pl-14 lg:pl-16 xl:pl-20 2xl:pl-24"
+          className="absolute inset-0"
+          initial={reduced ? false : { scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Image
+            src={hero.heroImageUrl}
+            alt="ProfUsta hizmet uzmanı"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+            unoptimized={hero.heroImageUrl.startsWith("http")}
+          />
+        </motion.div>
+
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,18,15,0.45)_0%,rgba(3,18,15,0.72)_55%,rgba(3,18,15,0.96)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(8,122,97,0.22)_0%,transparent_48%)]" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[720px] w-full max-w-screen-2xl flex-col items-center justify-center px-6 py-20 text-center sm:px-10 lg:px-16">
+        <motion.div
+          className="mx-auto flex w-full max-w-5xl flex-col items-center"
           variants={heroStaggerContainer}
           initial={initial}
           animate={animate}
           transition={heroTransition}
         >
-          <motion.span
+          <motion.div
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="mb-5 inline-flex items-center gap-2 rounded-full bg-[#e5f3ef] px-4 py-1.5 text-[12px] font-black tracking-wide text-[#087a61]"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-black text-white shadow-[0_16px_40px_rgba(0,0,0,0.2)] backdrop-blur-md"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            {hero.heroBadge}
-          </motion.span>
+            <ShieldCheck className="h-4 w-4 text-[#36d1ad]" />
+            Doğrulanmış ustalarla güvenli hizmet
+          </motion.div>
 
           <motion.h1
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="max-w-[440px] text-[44px] font-black leading-[0.95] tracking-[-0.045em] text-[#083228] sm:text-[58px] lg:text-[64px]"
+            className="max-w-5xl text-[44px] font-black leading-[1.06] tracking-[-0.055em] text-white sm:text-[58px] lg:text-[72px]"
           >
-            {titleLines.map((line, i) => (
-              <span key={i}>
-                {line}
-                {i < titleLines.length - 1 ? <br /> : null}
-              </span>
-            ))}
+            {titleLines.map((line, index) => {
+              const isLast = index === titleLines.length - 1;
+
+              return (
+                <span
+                  key={index}
+                  className={
+                    isLast && titleLines.length > 1
+                      ? "text-[#087A61] drop-shadow-[0_12px_35px_rgba(8,122,97,0.45)]"
+                      : undefined
+                  }
+                >
+                  {line}
+                  {index < titleLines.length - 1 ? <br /> : null}
+                </span>
+              );
+            })}
           </motion.h1>
 
           <motion.p
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="mt-5 max-w-[390px] text-[15px] leading-6 text-[#53635f]"
+            className="mt-7 max-w-3xl text-[17px] font-medium leading-8 text-white/85 sm:text-xl sm:leading-9"
           >
             {hero.heroSubtitle}
           </motion.p>
@@ -97,130 +122,58 @@ export function HomeHero({ hero }: { hero: HeroProps }) {
             variants={heroStaggerItem}
             transition={heroTransition}
             onSubmit={handleSearch}
-            className="mt-8 flex h-[46px] max-w-[470px] overflow-hidden rounded-xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] ring-1 ring-black/5"
+            className="mt-11 flex h-[78px] w-full max-w-[920px] overflow-hidden rounded-[28px] bg-white shadow-[0_28px_80px_rgba(0,0,0,0.32)] ring-1 ring-white/20 max-sm:h-14 max-sm:rounded-2xl"
           >
-            <div className="flex flex-1 items-center gap-3 px-5">
-              <Search className="h-4 w-4 text-[#0c8b6f]" />
+            <div className="flex min-w-0 flex-1 items-center gap-4 px-7 max-sm:gap-3 max-sm:px-4">
+              <Search className="h-6 w-6 shrink-0 text-[#087A61] max-sm:hidden" />
+
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={hero.heroSearchPlaceholder}
-                className="h-full w-full bg-transparent text-sm text-[#263b36] outline-none placeholder:text-[#8b9b96]"
+                className="h-full min-w-0 flex-1 bg-transparent text-left text-[18px] font-medium text-[#083228] outline-none placeholder:text-[#8b9b96] max-sm:text-base"
               />
             </div>
 
             <button
               type="submit"
-              aria-label="Hizmet ara"
-              className="grid w-[64px] place-items-center bg-[#087a61] text-white transition hover:bg-[#06644f]"
+              aria-label="Usta bul"
+              className="flex w-[210px] shrink-0 items-center justify-center gap-3 bg-[#087A61] text-[18px] font-black text-white transition hover:bg-[#06644f] max-sm:w-14 max-sm:gap-0"
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-6 w-6 max-sm:h-5 max-sm:w-5" />
+              <span className="max-sm:hidden">Usta Bul</span>
             </button>
           </motion.form>
 
           <motion.div
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="mt-5 flex max-w-[470px] flex-wrap items-center gap-3"
+            className="mt-10 grid w-full max-w-[930px] gap-4 md:grid-cols-3"
           >
-            <Link
-              href={hero.heroPrimaryCtaHref}
-              className="inline-flex h-[46px] items-center gap-2 rounded-xl bg-[#087a61] px-6 text-sm font-black text-white shadow-[0_10px_28px_rgba(8,122,97,0.25)] transition hover:bg-[#06644f]"
-            >
-              {hero.heroPrimaryCtaLabel}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <Link
-              href={hero.heroSecondaryCtaHref}
-              className="inline-flex h-[46px] items-center rounded-xl border border-[#d7e5e1] bg-white px-6 text-sm font-bold text-[#087a61] transition hover:bg-[#eef8f5]"
-            >
-              {hero.heroSecondaryCtaLabel}
-            </Link>
-          </motion.div>
-
-          <motion.div
-            variants={heroStaggerItem}
-            transition={heroTransition}
-            className="mt-8 flex max-w-[520px] flex-wrap gap-6"
-          >
-            <TrustItem
-              icon={<ShieldCheck className="h-4 w-4" />}
-              title="Güvenilir Ustalar"
-              text="Kimlik doğrulama"
+            <TrustPill
+              icon={<BadgeCheck className="h-6 w-6" />}
+              title="Doğrulanmış Ustalar"
+              text="Kimlik ve yetki doğrulaması"
             />
-            <TrustItem
-              icon={<Tag className="h-4 w-4" />}
-              title="Uygun Fiyatlar"
-              text="En iyi teklifleri alın"
+            <TrustPill
+              icon={<Zap className="h-6 w-6" />}
+              title="Hızlı Teklif"
+              text="Kısa sürede fiyat teklifi alın"
             />
-            <TrustItem
-              icon={<Headphones className="h-4 w-4" />}
-              title="7/24 Destek"
-              text="Yardımınızdayız"
+            <TrustPill
+              icon={<LockKeyhole className="h-6 w-6" />}
+              title="Güvenli Hizmet"
+              text="Ödemeniz koruma altında"
             />
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          className="relative hidden h-full w-full overflow-hidden lg:block"
-          variants={heroImage}
-          initial={initial}
-          animate={animate}
-          transition={{ ...heroTransition, delay: 0.15 }}
-        >
-          <Image
-            src={hero.heroImageUrl}
-            alt="ProfUsta hizmet uzmanı"
-            fill
-            priority
-            className="object-cover object-center"
-            unoptimized={hero.heroImageUrl.startsWith("http")}
-          />
-
-          <div className="absolute inset-y-0 left-0 w-[42%] bg-linear-to-r from-[#f7f7f3] via-[#f7f7f3]/80 to-transparent" />
-
-          <motion.div
-            variants={heroStaggerItem}
-            initial={initial}
-            animate={animate}
-            transition={{ ...heroTransition, delay: 0.35 }}
-            className="absolute right-10 top-1/2 w-[450px] -translate-y-1/2 rounded-3xl bg-white/95 px-8 py-8 text-center shadow-[0_24px_70px_rgba(15,23,42,0.16)] backdrop-blur xl:right-24 2xl:right-36"
-          >
-            <div className="text-xl font-black text-[#087a61]">
-              {hero.heroRating}
-            </div>
-
-            <div className="mt-3 text-xl tracking-[3px] text-[#f5b51b]">
-              ★★★★★
-            </div>
-
-            <p className="mt-4 text-sm font-semibold text-[#53635f]">
-              {hero.heroRatingLabel}
-            </p>
-
-            <div className="mt-5 flex justify-center -space-x-2">
-              {["A", "B", "C", "D", "E"].map((item) => (
-                <div
-                  key={item}
-                  className="grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-[#d9ebe5] text-xs font-black text-[#087a61]"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-
-            <p className="mt-5 text-xs font-semibold text-[#7b8b87]">
-              Bize güvenen binlerce kişi
-            </p>
-          </motion.div>
         </motion.div>
       </div>
     </section>
   );
 }
 
-function TrustItem({
+function TrustPill({
   icon,
   title,
   text,
@@ -230,16 +183,37 @@ function TrustItem({
   text: string;
 }) {
   return (
-    <div className="flex items-start gap-3">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#e5f3ef] text-[#087a61]">
+    <div className="flex items-center gap-4 rounded-[24px] border border-white/10 bg-white/12 px-5 py-4 text-left shadow-[0_18px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+      <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/12 text-[#36d1ad] ring-1 ring-white/10">
         {icon}
       </div>
 
       <div>
-        <div className="text-[13px] font-black leading-4 text-[#083228]">
-          {title}
-        </div>
-        <div className="mt-1 text-[11px] leading-4 text-[#667570]">{text}</div>
+        <h3 className="text-[15px] font-black text-white">{title}</h3>
+        <p className="mt-1 text-sm font-medium text-white/72">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function HeroStat({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-5 border-white/10 px-7 py-7 text-left md:border-r md:last:border-r-0">
+      <div className="text-white/90">{icon}</div>
+
+      <div>
+        <p className="text-[30px] font-black leading-none text-white">
+          {value}
+        </p>
+        <p className="mt-2 text-sm font-medium text-white/72">{label}</p>
       </div>
     </div>
   );

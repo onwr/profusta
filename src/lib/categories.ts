@@ -21,3 +21,26 @@ export async function getCategoryBySlug(slug: string) {
     },
   });
 }
+
+export async function getCategoriesWithServices() {
+  return db.category.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: "asc" },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      icon: true,
+      coverImageUrl: true,
+      services: {
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+        },
+      },
+    },
+  });
+}

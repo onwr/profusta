@@ -1,10 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ChevronDown,
-  Headphones,
-} from "lucide-react";
+import { ArrowRight, Headphones } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import { FooterNewsletter } from "@/components/layout/footer-newsletter";
 
@@ -49,19 +45,19 @@ const footerColumns = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#06291f] text-white">
-      <div className="bg-gradient-to-r from-[#087a61] via-[#07745d] to-[#063c30]">
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-6 px-8 py-6 sm:px-12 lg:flex-row lg:items-center lg:justify-between lg:px-16 xl:px-20 2xl:px-24">
+    <footer className="border-t border-[#e8ecf0] bg-[#f8fafc] text-[#0f1419]">
+      <div className="border-b border-[#e8ecf0] bg-white">
+        <div className="mx-auto flex max-w-screen-2xl flex-col gap-6 px-8 py-8 sm:px-12 lg:flex-row lg:items-center lg:justify-between lg:px-16 xl:px-20 2xl:px-24">
           <div className="flex items-center gap-5">
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-[#087a61]">
-              <Headphones className="h-8 w-8" />
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f1f5f9] text-[#475569] ring-1 ring-[#e2e8f0]">
+              <Headphones className="h-7 w-7" />
             </div>
 
             <div>
-              <h3 className="text-xl font-black">
+              <h3 className="text-lg font-black tracking-tight">
                 Yardıma mı ihtiyacınız var?
               </h3>
-              <p className="mt-1 text-sm font-medium text-white/85">
+              <p className="mt-1 text-sm text-[#64748b]">
                 Destek ekibimiz 7/24 sizinle!
               </p>
             </div>
@@ -69,7 +65,7 @@ export function SiteFooter() {
 
           <Link
             href="/iletisim"
-            className="inline-flex h-12 items-center justify-center gap-3 rounded-full bg-white px-10 text-sm font-black text-[#087a61] shadow-[0_14px_34px_rgba(0,0,0,.16)] transition hover:bg-[#f4f8f6]"
+            className="inline-flex h-12 items-center justify-center gap-3 rounded-xl bg-[#0f1419] px-8 text-sm font-bold text-white shadow-[0_8px_24px_rgba(15,20,25,0.12)] transition hover:bg-[#1e293b]"
           >
             İletişime Geçin
             <ArrowRight className="h-4 w-4" />
@@ -78,7 +74,7 @@ export function SiteFooter() {
       </div>
 
       <div className="mx-auto max-w-screen-2xl px-8 py-12 sm:px-12 lg:px-16 xl:px-20 2xl:px-24">
-        <div className="grid gap-10 border-b border-white/15 pb-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.4fr]">
+        <div className="grid gap-10 border-b border-[#e2e8f0] pb-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.4fr]">
           <div>
             <Link href="/" className="inline-flex">
               <Image
@@ -86,11 +82,11 @@ export function SiteFooter() {
                 alt="ProfUsta"
                 width={135}
                 height={42}
-                className="h-9 w-auto brightness-0 invert"
+                className="h-9 w-auto"
               />
             </Link>
 
-            <p className="mt-5 max-w-[260px] text-sm leading-6 text-white/70">
+            <p className="mt-5 max-w-[280px] text-sm leading-6 text-[#64748b]">
               Ev işlerinizi kolaylaştıran platform. Güvenilir ustalar, kaliteli
               hizmet, mutlu müşteriler.
             </p>
@@ -105,14 +101,16 @@ export function SiteFooter() {
 
           {footerColumns.map((column) => (
             <div key={column.title}>
-              <h4 className="text-base font-black">{column.title}</h4>
+              <h4 className="text-sm font-black uppercase tracking-[0.08em] text-[#334155]">
+                {column.title}
+              </h4>
 
               <ul className="mt-5 space-y-3">
                 {column.links.map(([label, href]) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="text-sm font-medium text-white/70 transition hover:text-white"
+                      className="text-sm font-medium text-[#64748b] transition hover:text-[#0f1419]"
                     >
                       {label}
                     </Link>
@@ -123,8 +121,10 @@ export function SiteFooter() {
           ))}
 
           <div>
-            <h4 className="text-base font-black">Bülten</h4>
-            <p className="mt-5 text-sm text-white/70">
+            <h4 className="text-sm font-black uppercase tracking-[0.08em] text-[#334155]">
+              Bülten
+            </h4>
+            <p className="mt-5 text-sm text-[#64748b]">
               Yeniliklerden haberdar olun.
             </p>
 
@@ -132,9 +132,8 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pt-6 text-sm text-white/65 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 pt-6 text-sm text-[#94a3b8] sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 ProfUsta. Tüm hakları saklıdır.</p>
-
         </div>
       </div>
     </footer>
@@ -155,7 +154,7 @@ function Social({
       href={href}
       aria-label={label}
       title={`${label} — iletişim`}
-      className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-[#087a61]"
+      className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#64748b] ring-1 ring-[#e2e8f0] transition hover:bg-[#f1f5f9] hover:text-[#0f1419]"
     >
       {icon}
     </Link>

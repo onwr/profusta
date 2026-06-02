@@ -32,27 +32,30 @@ export function FooterNewsletter() {
 
   if (done) {
     return (
-      <div className="mt-5 flex items-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm text-white/85">
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-[#36E4C2]" />
+      <div className="mt-5 flex items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 py-3 text-sm text-[#475569]">
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-[#0f1419]" />
         Kaydınız alındı. Yeniliklerden haberdar olacaksınız.
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-5 flex h-12 overflow-hidden rounded-xl bg-white">
+    <form
+      onSubmit={onSubmit}
+      className="mt-5 flex h-12 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-sm"
+    >
       <input
         type="email"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="E-posta adresiniz"
-        className="min-w-0 flex-1 px-4 text-sm text-[#083228] outline-none placeholder:text-[#8b9b96]"
+        className="min-w-0 flex-1 px-4 text-sm text-[#0f1419] outline-none placeholder:text-[#94a3b8]"
       />
 
       <button
         type="submit"
-        className="grid w-14 place-items-center bg-[#087a61] text-white"
+        className="grid w-14 place-items-center bg-[#0f1419] text-white transition hover:bg-[#1e293b]"
         aria-label="Bültene kaydol"
       >
         <ArrowRight className="h-4 w-4" />

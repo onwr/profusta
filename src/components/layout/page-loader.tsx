@@ -4,27 +4,38 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BrandLoader } from "@/components/layout/loading-brand";
 
-const MIN_VISIBLE_MS = 1100;
-const MAX_WAIT_MS = 4000;
+const MIN_VISIBLE_MS = 850;
+const MAX_WAIT_MS = 3500;
 
 export function PageLoader() {
   const [visible, setVisible] = useState(true);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
     const startedAt = performance.now();
     let done = false;
 
+    const tick = window.setInterval(() => {
+      setProgress((p) => {
+        if (p >= 92) return p;
+        return p + Math.random() * 8;
+      });
+    }, 120);
+
     const hide = () => {
       if (done) return;
       done = true;
+      window.clearInterval(tick);
+      setProgress(100);
+
       const elapsed = performance.now() - startedAt;
       const remaining = Math.max(0, MIN_VISIBLE_MS - elapsed);
 
       window.setTimeout(() => {
         setVisible(false);
         document.body.style.overflow = "";
-      }, remaining);
+      }, remaining + 180);
     };
 
     if (document.readyState === "complete") {
@@ -36,6 +47,7 @@ export function PageLoader() {
     const fallback = window.setTimeout(hide, MAX_WAIT_MS);
 
     return () => {
+      window.clearInterval(tick);
       window.removeEventListener("load", hide);
       window.clearTimeout(fallback);
       document.body.style.overflow = "";
@@ -44,33 +56,46 @@ export function PageLoader() {
 
   return (
     <AnimatePresence mode="wait">
-      {visible && (
+      {visible ? (
         <motion.div
           key="splash"
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-[#f7f7f3]"
+          className="fixed inset-0 z-200 flex flex-col items-center justify-center overflow-hidden bg-linear-to-b from-[#f8fcfa] via-[#f7f7f3] to-[#eef8f5]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
         >
+          <div
+            className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-[#087a61]/10 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -right-16 bottom-1/4 h-64 w-64 rounded-full bg-[#087a61]/8 blur-3xl"
+            aria-hidden
+          />
+
           <motion.div
-            exit={{ opacity: 0, scale: 0.97, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed left-0 right-0 top-0 z-10 h-1 overflow-hidden bg-[#087a61]/10"
+            aria-hidden
           >
-            <BrandLoader size="lg" />
+            <motion.div
+              className="h-full origin-left bg-linear-to-r from-[#066b54] via-[#087a61] to-[#12a384]"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: Math.min(progress, 100) / 100 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            />
           </motion.div>
 
           <motion.div
-            className="absolute bottom-0 left-0 h-0.5 origin-left bg-[#087a61]"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{
-              duration: MIN_VISIBLE_MS / 1000,
-              ease: [0.4, 0, 0.2, 1],
-            }}
-            aria-hidden
-          />
+            exit={{ opacity: 0, scale: 0.96, y: -12 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <BrandLoader
+              size="lg"
+              tagline="Güvenilir usta, kolay hizmet"
+            />
+          </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 }
