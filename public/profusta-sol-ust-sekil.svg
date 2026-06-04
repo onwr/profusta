@@ -1,0 +1,43 @@
+<svg width="520" height="520" viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mintBlob" x1="-30" y1="20" x2="300" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9F8F3"/>
+      <stop offset="1" stop-color="#D7F1E9"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0" y1="250" x2="170" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#087A61"/>
+      <stop offset="1" stop-color="#36D1AD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Soft left organic shape -->
+  <path d="M-115 28C-44 -30 72 -15 136 58C197 127 211 229 157 305C103 380 2 404 -83 368C-172 331 -221 241 -203 151C-194 100 -162 66 -115 28Z" fill="url(#mintBlob)" opacity="0.95"/>
+
+  <!-- Decorative outline circle -->
+  <circle cx="196" cy="110" r="34" stroke="#087A61" stroke-width="5" opacity="0.85"/>
+
+  <!-- Diagonal hatch area -->
+  <g opacity="0.95" stroke="url(#lineGrad)" stroke-width="4" stroke-linecap="round">
+    <line x1="-32" y1="256" x2="95" y2="383"/>
+    <line x1="-18" y1="239" x2="112" y2="369"/>
+    <line x1="-4" y1="222" x2="129" y2="355"/>
+    <line x1="10" y1="205" x2="146" y2="341"/>
+    <line x1="24" y1="188" x2="163" y2="327"/>
+    <line x1="38" y1="171" x2="180" y2="313"/>
+    <line x1="52" y1="154" x2="197" y2="299"/>
+    <line x1="66" y1="137" x2="214" y2="285"/>
+  </g>
+
+  <!-- Dot matrix -->
+  <g fill="#087A61" opacity="0.9">
+    <circle cx="112" cy="360" r="5"/>
+    <circle cx="136" cy="360" r="5"/>
+    <circle cx="160" cy="360" r="5"/>
+    <circle cx="112" cy="384" r="5"/>
+    <circle cx="136" cy="384" r="5"/>
+    <circle cx="160" cy="384" r="5"/>
+    <circle cx="112" cy="408" r="5"/>
+    <circle cx="136" cy="408" r="5"/>
+    <circle cx="160" cy="408" r="5"/>
+  </g>
+</svg>

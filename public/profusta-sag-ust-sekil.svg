@@ -1,0 +1,46 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkGreen" x1="140" y1="30" x2="850" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B8B6F"/>
+      <stop offset="0.55" stop-color="#087A61"/>
+      <stop offset="1" stop-color="#05624E"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="250" y1="350" x2="790" y2="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8FE2D4" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#5CCFBE" stop-opacity="0.86"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="760" y1="210" x2="900" y2="610" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D9FF55"/>
+      <stop offset="1" stop-color="#C5EF38"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="28" flood-color="#087A61" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- transparent background -->
+
+  <!-- Main top-right organic shape -->
+  <path filter="url(#softShadow)" d="M210 0H900V260C900 260 857 342 755 369C613 407 447 385 352 331C267 282 247 195 210 0Z" fill="url(#darkGreen)"/>
+
+  <!-- Soft lower mint shape -->
+  <path d="M355 323C438 407 588 440 743 391C816 368 876 316 900 283V540C814 563 704 595 576 565C453 536 389 455 355 323Z" fill="url(#mint)"/>
+
+  <!-- Lime side blob -->
+  <path d="M900 190V640C846 590 794 556 762 495C725 424 745 337 790 277C824 231 865 205 900 190Z" fill="url(#lime)"/>
+
+  <!-- Yellow ring -->
+  <circle cx="690" cy="188" r="73" stroke="#FFC94A" stroke-width="18"/>
+
+  <!-- Dot grid -->
+  <g fill="#083228">
+    <circle cx="635" cy="525" r="8"/>
+    <circle cx="668" cy="525" r="8"/>
+    <circle cx="701" cy="525" r="8"/>
+    <circle cx="734" cy="525" r="8"/>
+    <circle cx="635" cy="558" r="8"/>
+    <circle cx="668" cy="558" r="8"/>
+    <circle cx="701" cy="558" r="8"/>
+    <circle cx="734" cy="558" r="8"/>
+  </g>
+</svg>

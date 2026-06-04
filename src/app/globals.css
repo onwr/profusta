@@ -20,7 +20,7 @@
   --color-brand-600: var(--brand-600);
   --color-brand-700: var(--brand-700);
   --color-accent-500: var(--accent-500);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {

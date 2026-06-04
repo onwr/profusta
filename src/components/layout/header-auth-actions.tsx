@@ -46,18 +46,25 @@ export function HeaderAuthActions({
   if (!user) {
     if (variant === "mobile") {
       return (
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="flex flex-col gap-2.5">
           <Link
             href={ROUTES.login}
             onClick={onNavigate}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-white text-sm font-bold text-[#083228] ring-1 ring-black/10"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-white text-sm font-bold text-[#083228] ring-1 ring-black/10"
           >
             Giriş Yap
           </Link>
           <Link
+            href={ROUTES.register}
+            onClick={onNavigate}
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#f6f8fb] text-sm font-bold text-[#53635f] ring-1 ring-black/10"
+          >
+            Kayıt Ol
+          </Link>
+          <Link
             href={ROUTES.providerApply}
             onClick={onNavigate}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-[#087a61] text-sm font-bold text-white"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#087a61] text-sm font-black text-white"
           >
             Usta Ol
           </Link>

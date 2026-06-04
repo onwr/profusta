@@ -15,14 +15,7 @@ export default async function HomePage() {
     <>
       {config.showHero ? <HomeHero hero={config} /> : null}
       {config.showPopularServices ? (
-        <CategoryServiceBrowser
-          categories={content.categoryBrowser}
-          section={{
-            eyebrow: config.popularServicesEyebrow,
-            title: config.popularServicesTitle,
-            subtitle: config.popularServicesSubtitle,
-          }}
-        />
+        <CategoryServiceBrowser categories={content.categoryBrowser} />
       ) : null}
       {config.showHowItWorks ? (
         <HowItWorks

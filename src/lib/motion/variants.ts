@@ -114,6 +114,13 @@ export const panelPage: Variants = {
   exit: { opacity: 0, y: -10 },
 };
 
+/** Anasayfa kategori gezgini — sekme içeriği geçişi */
+export const categoryPanel: Variants = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -12 },
+};
+
 export const defaultViewport = {
   once: true,
   margin: "-80px" as const,

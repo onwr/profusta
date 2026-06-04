@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { APP_NAME } from "@/lib/constants";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const montserrat = Montserrat({
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
 });
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -56,11 +57,11 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${geistSans.variable} h-full`}
+      className={`${montserrat.variable} h-full`}
       suppressHydrationWarning
     >
       <body
-        className="flex min-h-full flex-col antialiased"
+        className={`${montserrat.className} flex min-h-full flex-col antialiased`}
         suppressHydrationWarning
       >
         <SiteShell>{children}</SiteShell>

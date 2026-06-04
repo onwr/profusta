@@ -1,13 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionReveal } from "@/components/motion/section-reveal";
 import { getCategoryIcon } from "@/lib/category-icons";
 import { ROUTES } from "@/lib/constants";
 import { homeSectionX } from "@/lib/homepage/section-layout";
+import { easeOut } from "@/lib/motion/transitions";
+import { useMotionConfig } from "@/lib/motion/use-motion-config";
+import { categoryPanel } from "@/lib/motion/variants";
 import { cn } from "@/lib/utils";
+
+const categoryTabSpring = {
+  type: "spring" as const,
+  stiffness: 420,
+  damping: 34,
+};
+
+const categoryPanelTransition = {
+  duration: 0.3,
+  ease: easeOut,
+};
 
 export type CategoryWithServices = {
   id: string;
@@ -22,151 +37,255 @@ export type CategoryWithServices = {
   }[];
 };
 
-type SectionCopy = {
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-};
-
 export function CategoryServiceBrowser({
   categories,
-  section,
 }: {
   categories: CategoryWithServices[];
-  section: SectionCopy;
 }) {
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
+  const { reduced } = useMotionConfig();
 
   if (categories.length === 0) return null;
 
   const activeCategory =
-    categories.find((c) => c.id === activeId) ?? categories[0];
+    categories.find((category) => category.id === activeId) ?? categories[0];
 
   return (
-    <SectionReveal className={`bg-white py-12 ${homeSectionX}`}>
-      <div className="mb-8">
-        <span className="inline-flex items-center rounded-full bg-[#eef8f5] px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-[#087a61]">
-          {section.eyebrow}
-        </span>
-        <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] text-[#083228]">
-          {section.title}
-        </h2>
-        <p className="mt-2 text-sm text-[#53635f]">{section.subtitle}</p>
-      </div>
+    <SectionReveal className={`bg-white pb-16 pt-2 ${homeSectionX}`}>
+      <div className="mx-auto max-w-screen-2xl">
+        <CategoryTabScroller
+          categories={categories}
+          activeId={activeCategory.id}
+          onSelect={setActiveId}
+        />
 
-      <div className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max flex-nowrap items-end justify-start gap-5 border-b border-[#e4ece8] sm:gap-7 lg:min-w-0 lg:w-full lg:justify-between lg:gap-3">
+        <CategoryPanelContent category={activeCategory} reduced={reduced} />
+      </div>
+    </SectionReveal>
+  );
+}
+
+const SCROLL_STEP = 280;
+
+function CategoryTabScroller({
+  categories,
+  activeId,
+  onSelect,
+}: {
+  categories: CategoryWithServices[];
+  activeId: string;
+  onSelect: (id: string) => void;
+}) {
+  const { reduced, fastTransition } = useMotionConfig();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 8);
+    setCanScrollRight(el.scrollLeft < maxScroll - 8);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollState();
+
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      observer.disconnect();
+    };
+  }, [updateScrollState, categories.length]);
+
+  useEffect(() => {
+    const el = scrollRef.current?.querySelector<HTMLElement>(
+      `[data-category-id="${activeId}"]`,
+    );
+    el?.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [activeId, reduced]);
+
+  function scrollTabs(direction: -1 | 1) {
+    scrollRef.current?.scrollBy({
+      left: direction * SCROLL_STEP,
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }
+
+  return (
+    <div className="flex items-center gap-2 sm:gap-3">
+      <button
+        type="button"
+        aria-label="Önceki kategoriler"
+        onClick={() => scrollTabs(-1)}
+        disabled={!canScrollLeft}
+        className={cn(
+          "grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#dce6e2] bg-white text-[#083228] shadow-sm transition hover:border-[#087A61]/30 hover:bg-[#f4faf7] hover:text-[#087A61] disabled:pointer-events-none disabled:opacity-0 sm:h-11 sm:w-11",
+        )}
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+
+      <div
+        ref={scrollRef}
+        className="min-w-0 flex-1 overflow-x-auto scroll-smooth scrollbar-none"
+      >
+        <div
+          role="tablist"
+          aria-label="Hizmet kategorileri"
+          className="flex w-max items-stretch gap-3 border-b border-[#e4ece8] px-1 pb-px sm:gap-4 md:gap-5"
+        >
           {categories.map((category) => {
             const Icon = getCategoryIcon(category.icon);
-            const isActive = category.id === activeCategory.id;
+            const isActive = category.id === activeId;
 
             return (
-              <button
+              <motion.button
                 key={category.id}
+                data-category-id={category.id}
                 type="button"
-                onClick={() => setActiveId(category.id)}
+                role="tab"
+                aria-selected={isActive}
+                title={category.name}
+                onClick={() => onSelect(category.id)}
+                whileTap={reduced ? undefined : { scale: 0.96 }}
+                transition={fastTransition}
                 className={cn(
-                  "group flex shrink-0 flex-col items-center gap-2.5 px-1 pb-0 lg:min-w-0 lg:flex-1 lg:px-2",
-                  isActive ? "text-[#087a61]" : "text-[#66736f] hover:text-[#083228]",
+                  "group relative flex shrink-0 flex-col items-center px-3 pt-1 sm:px-4",
+                  isActive ? "text-[#087A61]" : "text-[#66736f]",
                 )}
               >
-                <Icon
-                  className={cn(
-                    "h-7 w-7 transition-colors sm:h-8 sm:w-8",
-                    isActive
-                      ? "text-[#087a61]"
-                      : "text-[#9aa8a3] group-hover:text-[#53635f]",
-                  )}
-                  strokeWidth={isActive ? 2 : 1.5}
-                />
                 <span
                   className={cn(
-                    "whitespace-nowrap text-center text-[12px] leading-none sm:text-[13px]",
-                    isActive ? "font-bold text-[#087a61]" : "font-medium text-[#66736f]",
+                    "flex h-14 w-14 items-center justify-center rounded-2xl transition-colors duration-200 sm:h-16 sm:w-16",
+                    isActive
+                      ? "bg-[#e8f6f1] text-[#087A61] ring-1 ring-[#087A61]/15"
+                      : "bg-[#f6f9f8] text-[#6b7c77] group-hover:bg-[#edf7f3] group-hover:text-[#087A61]",
+                  )}
+                >
+                  <Icon
+                    className="h-7 w-7 sm:h-8 sm:w-8"
+                    strokeWidth={isActive ? 2.1 : 1.6}
+                  />
+                </span>
+
+                <span
+                  className={cn(
+                    "mt-3 whitespace-nowrap text-center text-[13px] leading-none tracking-tight sm:text-sm",
+                    isActive
+                      ? "font-bold text-[#087A61]"
+                      : "font-semibold text-[#53635f] group-hover:text-[#083228]",
                   )}
                 >
                   {category.name}
                 </span>
-                <span
-                  className={cn(
-                    "mt-2 h-[3px] w-full rounded-full transition-colors",
-                    isActive ? "bg-[#087a61]" : "bg-transparent",
-                  )}
-                />
-              </button>
+
+                <span className="relative mt-3 mb-0 flex h-[3px] w-full min-w-full items-center justify-center px-1">
+                  {isActive ? (
+                    reduced ? (
+                      <span className="h-full w-full rounded-full bg-[#087A61]" />
+                    ) : (
+                      <motion.span
+                        layoutId="category-tab-underline"
+                        className="h-full w-full rounded-full bg-[#087A61]"
+                        transition={categoryTabSpring}
+                      />
+                    )
+                  ) : null}
+                </span>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
-      {activeCategory.services.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-black/10 bg-[#f8fcfa] px-6 py-10 text-center">
-          <p className="text-sm font-medium text-[#66736f]">
-            Bu kategoride henüz alt hizmet yok.
-          </p>
-          <Link
-            href={`${ROUTES.categories}/${activeCategory.slug}`}
-            className="mt-3 inline-block text-sm font-bold text-[#087a61] hover:underline"
-          >
-            Kategoriyi incele
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {activeCategory.services.map((service) => (
-            <ServiceCard
-              key={service.id}
-              href={`${ROUTES.createRequest}?kategori=${activeCategory.slug}&hizmet=${service.slug}`}
-              title={service.name}
-              coverImageUrl={activeCategory.coverImageUrl}
-              categoryIcon={activeCategory.icon}
-            />
-          ))}
-        </div>
-      )}
-    </SectionReveal>
+      <button
+        type="button"
+        aria-label="Sonraki kategoriler"
+        onClick={() => scrollTabs(1)}
+        disabled={!canScrollRight}
+        className={cn(
+          "grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#dce6e2] bg-white text-[#083228] shadow-sm transition hover:border-[#087A61]/30 hover:bg-[#f4faf7] hover:text-[#087A61] disabled:pointer-events-none disabled:opacity-0 sm:h-11 sm:w-11",
+        )}
+      >
+        <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+    </div>
   );
 }
 
-function ServiceCard({
-  href,
-  title,
-  coverImageUrl,
-  categoryIcon,
+function CategoryPanelContent({
+  category,
+  reduced,
 }: {
-  href: string;
-  title: string;
-  coverImageUrl: string | null;
-  categoryIcon: string | null;
+  category: CategoryWithServices;
+  reduced: boolean;
 }) {
-  const Icon = getCategoryIcon(categoryIcon);
+  const services = category.services;
+
+  const content =
+    category.services.length > 0 ? (
+      <div className="mt-8 text-center">
+        <p className="text-[15px] font-medium text-[#53635f] sm:text-base">
+          Almak istediğiniz hizmeti seçebilirsiniz
+        </p>
+
+        <div className="mt-5 flex flex-wrap justify-center gap-3 sm:gap-4">
+          {services.map((service) => (
+            <Link
+              key={service.id}
+              href={`${ROUTES.createRequest}?kategori=${category.slug}&hizmet=${service.slug}`}
+              className="inline-flex h-12 items-center justify-center rounded-full border border-black/15 bg-white px-6 text-[14px] font-bold text-[#083228] transition hover:border-[#087A61]/40 hover:bg-[#f4faf7] hover:text-[#087A61] sm:h-14 sm:px-8 sm:text-[15px]"
+            >
+              {service.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div className="mt-8 rounded-[28px] border border-dashed border-black/10 bg-[#f8fcfa] px-6 py-10 text-center">
+        <p className="text-sm font-medium text-[#66736f]">
+          Bu kategoride henüz alt hizmet yok.
+        </p>
+
+        <Link
+          href={`${ROUTES.categories}/${category.slug}`}
+          className="mt-3 inline-block text-sm font-bold text-[#087A61] hover:underline"
+        >
+          Kategoriyi incele
+        </Link>
+      </div>
+    );
+
+  if (reduced) {
+    return <div key={category.id}>{content}</div>;
+  }
 
   return (
-    <Link
-      href={href}
-      className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef3f1] ring-1 ring-black/5 transition hover:ring-[#087a61]/30"
-    >
-      {coverImageUrl ? (
-        <>
-          <Image
-            src={coverImageUrl}
-            alt={title}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-            unoptimized={coverImageUrl.startsWith("http")}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-        </>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#eef8f5] to-[#dceee8]">
-          <Icon className="h-10 w-10 text-[#087a61]/35" strokeWidth={1.5} />
-        </div>
-      )}
-
-      <span className="absolute bottom-3 left-3 right-3 text-sm font-bold leading-snug text-white drop-shadow-sm sm:text-[15px]">
-        {title}
-      </span>
-    </Link>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={category.id}
+        className="will-change-[opacity,transform]"
+        variants={categoryPanel}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={categoryPanelTransition}
+      >
+        {content}
+      </motion.div>
+    </AnimatePresence>
   );
 }

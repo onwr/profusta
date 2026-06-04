@@ -74,13 +74,13 @@ function PopularCategoryCard({ category }: { category: HomeCategory }) {
       href={`${ROUTES.categories}/${category.slug}`}
       className="group block overflow-hidden rounded-2xl border border-[#e8eeeb] bg-white shadow-[0_10px_36px_rgba(8,50,40,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#087a61]/20 hover:shadow-[0_16px_44px_rgba(8,50,40,0.11)]"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#eef3f1]">
+      <div className="relative aspect-4/3 overflow-hidden bg-[#eef3f1]">
         {cover ? (
           <Image
             src={cover}
             alt={category.name}
             fill
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="object-cover transition object-right duration-500 group-hover:scale-[1.03]"
             sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
             unoptimized={cover.startsWith("http")}
           />
