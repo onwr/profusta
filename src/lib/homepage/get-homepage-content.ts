@@ -144,6 +144,23 @@ export async function getHomepageContent() {
 
 export type HomepageContent = Awaited<ReturnType<typeof getHomepageContent>>;
 
+/** DB hatasında anasayfanın tamamen 500 vermesini engeller. */
+export async function getHomepageContentSafe(): Promise<HomepageContent> {
+  try {
+    return await getHomepageContent();
+  } catch (error) {
+    console.error("[homepage] İçerik yüklenemedi:", error);
+    return {
+      config: DEFAULT_HOMEPAGE_CONFIG,
+      stats: activeByType(mapDefaultItems(), "STAT"),
+      testimonials: activeByType(mapDefaultItems(), "TESTIMONIAL"),
+      howItWorksSteps: activeByType(mapDefaultItems(), "HOW_IT_WORKS_STEP"),
+      categories: [],
+      categoryBrowser: [],
+    };
+  }
+}
+
 export type HomepagePickerOption = {
   services: {
     id: string;

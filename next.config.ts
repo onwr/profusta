@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
 
-const cdnHost = process.env.CDN_BASE_URL
-  ? new URL(process.env.CDN_BASE_URL).hostname
-  : "cdn.littlemomstore.com";
+function safeCdnHostname(): string {
+  const raw = process.env.CDN_BASE_URL?.trim();
+  if (!raw) return "cdn.littlemomstore.com";
+  try {
+    return new URL(raw).hostname;
+  } catch {
+    return "cdn.littlemomstore.com";
+  }
+}
+
+const cdnHost = safeCdnHostname();
 
 const nextConfig: NextConfig = {
   images: {

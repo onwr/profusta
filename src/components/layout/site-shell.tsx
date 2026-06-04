@@ -16,8 +16,14 @@ function toHeaderUser(
 }
 
 export async function SiteShell({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
-  const headerUser = user ? toHeaderUser(user) : null;
+  let headerUser: HeaderUser | null = null;
+
+  try {
+    const user = await getCurrentUser();
+    headerUser = user ? toHeaderUser(user) : null;
+  } catch (error) {
+    console.error("[SiteShell] Oturum okunamadı:", error);
+  }
 
   return (
     <>

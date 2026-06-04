@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { APP_NAME } from "@/lib/constants";
+import { safeAppUrl } from "@/lib/env-url";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -10,7 +11,7 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const appUrl = safeAppUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),

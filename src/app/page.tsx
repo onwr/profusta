@@ -5,10 +5,10 @@ import { HomeHero } from "@/components/home/Hero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PopularCategories } from "@/components/home/PopularCategories";
 import { CustomerReviews } from "@/components/home/CustomerReviews";
-import { getHomepageContent } from "@/lib/homepage/get-homepage-content";
+import { getHomepageContentSafe } from "@/lib/homepage/get-homepage-content";
 
 export default async function HomePage() {
-  const content = await getHomepageContent();
+  const content = await getHomepageContentSafe();
   const { config } = content;
 
   return (

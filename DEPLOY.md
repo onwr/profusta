@@ -45,8 +45,20 @@ npm run start
 Port varsayılan 3000. Process manager örneği (PM2):
 
 ```bash
+cd /path/to/profusta/web   # .env bu klasörde olmalı
 pm2 start npm --name profusta -- start
+pm2 save
 ```
+
+PM2 logları: `pm2 logs profusta --lines 80`  
+Sağlık: `curl -s http://127.0.0.1:3000/api/health` → `{"ok":true,"database":"ok",...}`
+
+**Sık hatalar**
+
+- `NEXT_PUBLIC_APP_URL` mutlaka `https://profusta.com` formatında (protokolsüz yazmayın).
+- `JWT_SECRET` en az 32 karakter.
+- `DATABASE_URL` erişilebilir MySQL; tablolar: `npm run db:push` veya migrate.
+- PM2 yanlış klasörden başlarsa `.env` okunmaz → DB hatası / 500.
 
 ## Cron (48 saat otomatik onay)
 
