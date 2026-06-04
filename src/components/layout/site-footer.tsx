@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Headphones } from "lucide-react";
 import { ROUTES } from "@/lib/constants";
 import { FooterNewsletter } from "@/components/layout/footer-newsletter";
+import { SiteLogo } from "@/components/layout/site-logo";
 
 import {
   FaFacebookF,
@@ -77,13 +77,7 @@ export function SiteFooter() {
         <div className="grid gap-10 border-b border-[#e2e8f0] pb-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.4fr]">
           <div>
             <Link href="/" className="inline-flex">
-              <Image
-                src="/logo.png"
-                alt="ProfUsta"
-                width={135}
-                height={42}
-                className="h-9 w-auto"
-              />
+              <SiteLogo width={135} height={42} className="h-9" />
             </Link>
 
             <p className="mt-5 max-w-[280px] text-sm leading-6 text-[#64748b]">

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,8 +11,9 @@ import {
   mobileMenu,
 } from "@/lib/motion/variants";
 import { useMotionConfig } from "@/lib/motion/use-motion-config";
-import { APP_NAME, ROUTES } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
 import { HeaderAuthActions } from "@/components/layout/header-auth-actions";
+import { SiteLogo } from "@/components/layout/site-logo";
 import type { HeaderUser } from "@/lib/auth/header-user";
 import { cn } from "@/lib/utils";
 
@@ -76,13 +76,11 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             className="inline-flex min-w-0 max-w-[min(52vw,200px)] items-center sm:max-w-[220px] lg:max-w-none"
             onClick={closeMobile}
           >
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
+            <SiteLogo
               width={165}
               height={46}
               priority
-              className="h-9 w-auto max-w-full object-contain object-left sm:h-10 lg:h-[46px]"
+              className="h-9 max-w-full sm:h-10 lg:h-[46px]"
             />
           </Link>
         </motion.div>

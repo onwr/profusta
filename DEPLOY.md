@@ -103,6 +103,14 @@ npm run lint
 npm run build   # MySQL erişilebilir olmalı
 ```
 
+## Logo güncelleme
+
+1. Yeni dosyayı `public/logo.png` üzerine kopyalayın.
+2. `.env` içinde `NEXT_PUBLIC_LOGO_VERSION=2` (her değişimde artırın).
+3. `rm -rf .next/cache/images` (eski Next image önbelleği).
+4. `npm run build && pm2 restart profusta`
+5. Tarayıcıda hard refresh (Ctrl+Shift+R) veya Cloudflare cache purge.
+
 ## SEO
 
 - `/sitemap.xml` — otomatik

@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BadgeCheck,
@@ -24,7 +24,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { ProviderAvatar } from "@/components/provider/provider-avatar";
-import { APP_NAME, ROUTES } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
 import type { ProviderNavCounts } from "@/lib/provider/dashboard-data";
 import { cn } from "@/lib/utils";
 
@@ -207,13 +207,11 @@ function SidebarContent({
             onClick={onMobileClose}
             className="mb-3 flex h-9 items-center px-1"
           >
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
+            <SiteLogo
               width={142}
               height={40}
-              className="h-7 w-auto object-contain brightness-0 invert"
               priority
+              className="h-7 brightness-0 invert"
             />
           </Link>
 

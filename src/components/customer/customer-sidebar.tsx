@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -19,7 +19,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { InviteFriendModal } from "@/components/customer/invite-friend-modal";
-import { ROUTES, APP_NAME } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
 import type { CustomerNavCounts } from "@/lib/customer/dashboard-data";
 import { cn } from "@/lib/utils";
 
@@ -103,13 +103,11 @@ function SidebarContent({
             className="mb-4 block px-2"
             onClick={onMobileClose}
           >
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
+            <SiteLogo
               width={150}
               height={44}
-              className="h-8 w-auto object-contain brightness-0 invert"
               priority
+              className="h-8 brightness-0 invert"
             />
           </Link>
 

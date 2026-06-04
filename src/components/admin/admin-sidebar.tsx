@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -26,7 +25,8 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
-import { APP_NAME, ROUTES } from "@/lib/constants";
+import { ROUTES } from "@/lib/constants";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { cn } from "@/lib/utils";
 
 type NavLink = {
@@ -103,13 +103,11 @@ export function AdminSidebar() {
       <div className="flex h-full max-h-dvh flex-col overflow-hidden p-4">
         <div className="shrink-0">
           <Link href={ROUTES.admin.dashboard} className="mb-3 block px-2">
-            <Image
-              src="/logo.png"
-              alt={APP_NAME}
+            <SiteLogo
               width={150}
               height={44}
-              className="h-8 w-auto object-contain brightness-0 invert"
               priority
+              className="h-8 brightness-0 invert"
             />
           </Link>
 

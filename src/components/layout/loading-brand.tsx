@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { logoLoader } from "@/lib/motion/variants";
 import { useMotionConfig } from "@/lib/motion/use-motion-config";
-import { APP_NAME } from "@/lib/constants";
+import { SiteLogo } from "@/components/layout/site-logo";
 import { cn } from "@/lib/utils";
 
 const sizeMap = {
@@ -96,13 +95,11 @@ export function BrandLoader({
         initial="hidden"
         animate="visible"
       >
-        <Image
-          src="/logo.png"
-          alt={APP_NAME}
+        <SiteLogo
           width={dims.width}
           height={dims.height}
           priority
-          className={cn("w-auto object-contain", dims.logoClass)}
+          className={dims.logoClass}
         />
       </motion.div>
 
