@@ -14,7 +14,7 @@
 
 | Değişken | Not |
 |----------|-----|
-| `DATABASE_URL` | Production MySQL |
+| `DATABASE_URL` | `mysql://user:pass@127.0.0.1:3306/profusta` (tercihen `127.0.0.1`, `localhost` değil). MySQL 8 için kodda `allowPublicKeyRetrieval` açık; gerekirse URL’ye `?allowPublicKeyRetrieval=true` ekleyin. |
 | `JWT_SECRET` | En az 32 karakter, rastgele |
 | `NEXT_PUBLIC_APP_URL` | `https://alanadiniz.com` |
 | `REDIS_URL` | `redis://...` |

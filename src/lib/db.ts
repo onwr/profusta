@@ -28,13 +28,19 @@ function createPrismaClient() {
   }
 
   const parsed = new URL(url);
+  const host =
+    parsed.hostname === "localhost" ? "127.0.0.1" : parsed.hostname;
+
   const adapter = new PrismaMariaDb({
-    host: parsed.hostname,
+    host,
     port: parsed.port ? Number(parsed.port) : 3306,
     user: decodeURIComponent(parsed.username),
     password: decodeURIComponent(parsed.password),
-    database: parsed.pathname.replace(/^\//, ""),
+    database: parsed.pathname.replace(/^\//, "").split("?")[0],
     connectionLimit: 5,
+    connectTimeout: 15_000,
+    // MySQL 8 caching_sha2_password — Node sürücüsü için gerekli
+    allowPublicKeyRetrieval: true,
   });
 
   return new PrismaClient({

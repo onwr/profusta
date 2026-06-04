@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { PageLoader } from "@/components/layout/page-loader";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -22,6 +23,7 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
     const user = await getCurrentUser();
     headerUser = user ? toHeaderUser(user) : null;
   } catch (error) {
+    unstable_rethrow(error);
     console.error("[SiteShell] Oturum okunamadı:", error);
   }
 
