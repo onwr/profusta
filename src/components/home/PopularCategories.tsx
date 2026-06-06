@@ -7,7 +7,7 @@ import { SectionReveal } from "@/components/motion/section-reveal";
 import { StaggerChildren, StaggerItem } from "@/components/motion/stagger-children";
 import { getCategoryIcon } from "@/lib/category-icons";
 import { ROUTES } from "@/lib/constants";
-import { homeSectionHeader, homeSectionX } from "@/lib/homepage/section-layout";
+import { homeSectionX } from "@/lib/homepage/section-layout";
 
 export type HomeCategory = {
   id: string;
@@ -35,16 +35,10 @@ export function PopularCategories({
 }) {
   return (
     <SectionReveal className={`bg-white pb-12 ${homeSectionX}`}>
-      <FadeIn className={`mb-10 ${homeSectionHeader}`}>
-        <div>
-          <span className="inline-flex items-center rounded-full bg-[#eef8f5] px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-[#087a61]">
-            {section.eyebrow}
-          </span>
-          <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] text-[#083228]">
-            {section.title}
-          </h2>
-          <p className="mt-2 text-sm text-[#53635f]">{section.subtitle}</p>
-        </div>
+      <FadeIn className="mb-10 flex max-w-7xl mx-auto flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-3xl font-black tracking-[-0.03em] text-[#083228]">
+          {section.title}
+        </h2>
 
         <Link
           href={section.ctaHref}
@@ -54,9 +48,9 @@ export function PopularCategories({
         </Link>
       </FadeIn>
 
-      <StaggerChildren className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+      <StaggerChildren className="mx-auto grid max-w-7xl grid-cols-2 gap-4 md:grid-cols-4 md:gap-5 lg:gap-6">
         {categories.map((category) => (
-          <StaggerItem key={category.id}>
+          <StaggerItem key={category.id} className="h-full">
             <PopularCategoryCard category={category} />
           </StaggerItem>
         ))}
@@ -68,33 +62,39 @@ export function PopularCategories({
 function PopularCategoryCard({ category }: { category: HomeCategory }) {
   const Icon = getCategoryIcon(category.icon);
   const cover = category.coverImageUrl;
+  const serviceCount = category._count.services;
 
   return (
     <Link
       href={`${ROUTES.categories}/${category.slug}`}
-      className="group block overflow-hidden rounded-2xl border border-[#e8eeeb] bg-white shadow-[0_10px_36px_rgba(8,50,40,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#087a61]/20 hover:shadow-[0_16px_44px_rgba(8,50,40,0.11)]"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-[0_2px_10px_rgba(15,23,42,0.05)] transition duration-200 hover:border-[#d1d5db] hover:shadow-[0_6px_20px_rgba(15,23,42,0.08)]"
     >
-      <div className="relative aspect-4/3 overflow-hidden bg-[#eef3f1]">
+      <div className="relative aspect-5/4 w-full shrink-0 overflow-hidden bg-[#f3f4f6]">
         {cover ? (
           <Image
             src={cover}
             alt={category.name}
             fill
-            className="object-cover transition object-right duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+            className="object-cover object-right transition duration-500 group-hover:scale-[1.02]"
+            sizes="(max-width:768px) 50vw, 25vw"
             unoptimized={cover.startsWith("http")}
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-linear-to-br from-[#f2f7f5] to-[#e7f2ef]">
-            <Icon className="h-12 w-12 text-[#087a61]/35" strokeWidth={1.5} />
+          <div className="flex h-full items-center justify-center bg-[#f3f4f6]">
+            <Icon className="h-14 w-14 text-[#087a61]/30" strokeWidth={1.5} />
           </div>
         )}
       </div>
 
-      <div className="px-3 py-4 text-center sm:px-4 sm:py-5">
-        <h3 className="text-sm font-bold leading-snug text-[#083228] transition group-hover:text-[#087a61] sm:text-[15px]">
+      <div className="flex flex-1 flex-col items-center justify-center px-3 py-4 text-center sm:px-4 sm:py-5">
+        <h3 className="text-[15px] font-bold leading-snug text-[#083228] sm:text-base">
           {category.name}
         </h3>
+        {serviceCount > 0 ? (
+          <p className="mt-1.5 text-[11px] font-normal leading-snug text-[#6b7280] sm:text-xs">
+            {serviceCount} hizmet seçeneği
+          </p>
+        ) : null}
       </div>
     </Link>
   );

@@ -30,7 +30,7 @@ const defaultCta: CtaCopy = {
 export function HomeCta({ cta = defaultCta }: { cta?: CtaCopy }) {
   return (
     <SectionReveal className={`bg-white pb-20 ${homeSectionX}`}>
-      <FadeIn className="relative overflow-hidden rounded-2xl border border-[#e8ecf0] bg-[#0f1419] px-5 py-10 shadow-[0_24px_80px_rgba(15,20,25,0.18)] sm:rounded-[32px] sm:px-12 sm:py-12 lg:px-16">
+      <FadeIn className="mx-auto max-w-7xl relative overflow-hidden rounded-2xl border border-[#e8ecf0] bg-[#0f1419] px-5 py-10 shadow-[0_24px_80px_rgba(15,20,25,0.18)] sm:rounded-[32px] sm:px-12 sm:py-12 lg:px-16">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),transparent_42%),radial-gradient(circle_at_85%_100%,rgba(148,163,184,0.12),transparent_38%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,transparent_48%,rgba(255,255,255,0.02)_100%)]" />
 

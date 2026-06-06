@@ -62,7 +62,7 @@ export function HeaderAuthActions({
             Kayıt Ol
           </Link>
           <Link
-            href={ROUTES.providerApply}
+            href="/usta-ol"
             onClick={onNavigate}
             className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#087a61] text-sm font-black text-white"
           >
@@ -73,26 +73,26 @@ export function HeaderAuthActions({
     }
 
     return (
-      <>
+      <div className="flex shrink-0 items-center gap-3 xl:gap-4">
         <Link
           href={ROUTES.login}
-          className="text-sm font-bold text-[#083228] transition hover:text-[#087a61]"
+          className="whitespace-nowrap text-sm font-bold text-[#083228] transition hover:text-[#087a61]"
         >
           Giriş Yap
         </Link>
         <Link
           href={ROUTES.register}
-          className="text-sm font-bold text-[#53635f] transition hover:text-[#087a61]"
+          className="whitespace-nowrap text-sm font-bold text-[#53635f] transition hover:text-[#087a61]"
         >
           Kayıt Ol
         </Link>
         <Link
-          href={ROUTES.providerApply}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-[#087a61] px-7 text-sm font-bold text-white shadow-[0_10px_24px_rgba(8,122,97,0.18)] transition hover:bg-[#06644f]"
+          href="/usta-ol"
+          className="inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#087a61] px-5 text-sm font-bold text-white shadow-[0_10px_24px_rgba(8,122,97,0.18)] transition hover:bg-[#06644f] xl:px-6"
         >
           Usta Ol
         </Link>
-      </>
+      </div>
     );
   }
 
@@ -159,7 +159,7 @@ export function HeaderAuthActions({
   }
 
   return (
-    <>
+    <div className="flex shrink-0 items-center gap-2 lg:gap-3">
       <NotificationBell buttonClassName="relative grid h-10 w-10 place-items-center rounded-full bg-white text-[#083228] ring-1 ring-black/10 transition hover:bg-[#eef8f5]" />
 
       <div className="relative">
@@ -248,6 +248,6 @@ export function HeaderAuthActions({
           </>
         ) : null}
       </div>
-    </>
+    </div>
   );
 }

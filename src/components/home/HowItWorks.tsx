@@ -26,17 +26,11 @@ export function HowItWorks({
 }) {
   return (
     <SectionReveal className={`bg-white pb-20 ${homeSectionX}`}>
-      <div className="mx-auto">
-        <FadeIn className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <span className="inline-flex items-center rounded-full bg-[#eef8f5] px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-[#087a61]">
-              {section.eyebrow}
-            </span>
-            <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] text-[#083228]">
-              {section.title}
-            </h2>
-            <p className="mt-2 text-sm text-[#53635f]">{section.subtitle}</p>
-          </div>
+      <div className="mx-auto max-w-7xl">
+        <FadeIn className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-3xl font-black tracking-[-0.03em] text-[#083228]">
+            {section.title}
+          </h2>
           <Link
             href={section.ctaHref}
             className="inline-flex items-center gap-1.5 text-sm font-bold text-[#087a61] hover:underline"

@@ -20,7 +20,9 @@ export function HomeHero({ hero }: { hero: HeroProps }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
-  const titleLines = hero.heroTitle.split("\n").filter(Boolean);
+  const titleText =
+    hero.heroTitle.replace(/\s*\n+\s*/g, " ").trim() ||
+    "Usta bulmanın en kolay yolu";
 
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -67,28 +69,15 @@ export function HomeHero({ hero }: { hero: HeroProps }) {
           <motion.h1
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="max-w-4xl text-[42px] font-semibold leading-[1.08] tracking-[-0.055em] text-[#083228] sm:text-[54px] lg:text-[68px]"
+            className="max-w-4xl whitespace-nowrap text-[24px] font-black leading-tight tracking-[-0.04em] text-[#083228] sm:text-[34px] lg:text-[40px]"
           >
-            {titleLines.length > 0 ? (
-              titleLines.map((line, index) => (
-                <span key={index}>
-                  {line}
-                  {index < titleLines.length - 1 ? <br /> : null}
-                </span>
-              ))
-            ) : (
-              <>
-                Eviniz için güvenilir
-                <br />
-                ustaları bulun
-              </>
-            )}
+            {titleText}
           </motion.h1>
 
           <motion.p
             variants={heroStaggerItem}
             transition={heroTransition}
-            className="mt-6 max-w-3xl text-[17px] font-light leading-8 text-[#3f5650] sm:text-xl sm:leading-9"
+            className="mt-5 max-w-2xl text-[14px] font-light leading-6 text-[#3f5650] sm:text-[15px] sm:leading-7 lg:text-base"
           >
             {hero.heroSubtitle}
           </motion.p>

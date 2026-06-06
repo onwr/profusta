@@ -73,14 +73,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         >
           <Link
             href={ROUTES.home}
-            className="inline-flex min-w-0 max-w-[min(52vw,200px)] items-center sm:max-w-[220px] lg:max-w-none"
+            className="inline-flex min-w-0 max-w-[140px] items-center sm:max-w-[160px]"
             onClick={closeMobile}
           >
             <SiteLogo
-              width={165}
-              height={46}
+              width={120}
+              height={34}
               priority
-              className="h-9 max-w-full sm:h-10 lg:h-[46px]"
+              className="h-7 max-w-full sm:h-8"
             />
           </Link>
         </motion.div>
@@ -125,22 +125,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             </motion.div>
           ) : null}
 
-          {!user ? (
-            <motion.div variants={headerStaggerItem} transition={fastTransition}>
-              <Link
-                href="/usta-ol"
-                className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-[#087A61] px-5 text-sm font-black text-white transition hover:bg-[#06644f] xl:px-6"
-              >
-                Usta Ol
-              </Link>
-            </motion.div>
-          ) : null}
-
-          <motion.div
-            variants={headerStaggerItem}
-            transition={fastTransition}
-            className="flex items-center"
-          >
+          <motion.div variants={headerStaggerItem} transition={fastTransition}>
             <HeaderAuthActions user={user} variant="desktop" />
           </motion.div>
         </motion.div>

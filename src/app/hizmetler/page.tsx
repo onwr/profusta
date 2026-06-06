@@ -115,8 +115,8 @@ export default async function ServicesPage({
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-5 shadow-2xl backdrop-blur">
-              <div className="rounded-[1.5rem] bg-white p-5">
+            <div className="rounded-4xl border border-white/10 bg-white/10 p-5 shadow-2xl backdrop-blur">
+              <div className="rounded-3xl bg-white p-5">
                 <div className="flex items-center justify-between gap-4 border-b border-black/5 pb-4">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-[#087a61]">
@@ -174,7 +174,7 @@ export default async function ServicesPage({
             return (
               <article
                 key={item.title}
-                className="rounded-[1.5rem] border border-black/5 bg-white p-5 shadow-[0_18px_55px_rgba(8,50,40,0.06)]"
+                className="rounded-3xl border border-black/5 bg-white p-5 shadow-[0_18px_55px_rgba(8,50,40,0.06)]"
               >
                 <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#eef8f5] text-[#087a61]">
                   <Icon className="h-6 w-6" />
@@ -229,7 +229,7 @@ export default async function ServicesPage({
                 <Link
                   key={provider.id}
                   href={`${ROUTES.providers}/${provider.slug ?? provider.id}`}
-                  className="rounded-[1.5rem] border border-black/5 bg-white p-5 shadow-[0_18px_55px_rgba(8,50,40,0.06)] transition hover:border-[#087a61]/25"
+                  className="rounded-3xl border border-black/5 bg-white p-5 shadow-[0_18px_55px_rgba(8,50,40,0.06)] transition hover:border-[#087a61]/25"
                 >
                   <div className="flex items-start gap-3">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#eef8f5] text-[#087a61]">
@@ -331,7 +331,7 @@ export default async function ServicesPage({
           })}
         </div>
         ) : hasQuery ? (
-          <div className="mt-8 rounded-[1.5rem] border border-dashed border-black/10 bg-white p-8 text-center">
+          <div className="mt-8 rounded-3xl border border-dashed border-black/10 bg-white p-8 text-center">
             <p className="text-sm font-semibold text-[#66736f]">
               Kategori bulunamadı. Doğrudan talep oluşturarak ustalardan teklif
               alabilirsiniz.
@@ -339,7 +339,7 @@ export default async function ServicesPage({
           </div>
         ) : null}
 
-        <div className="mt-14 overflow-hidden rounded-[2rem] bg-[#083228] shadow-[0_24px_70px_rgba(8,50,40,0.14)]">
+        <div className="mt-14 overflow-hidden rounded-4xl bg-[#083228] shadow-[0_24px_70px_rgba(8,50,40,0.14)]">
           <div className="bg-[radial-gradient(circle_at_top_left,rgba(8,122,97,0.5),transparent_34%),radial-gradient(circle_at_85%_20%,rgba(255,255,255,0.12),transparent_25%)] p-8 sm:p-10 lg:p-12">
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>

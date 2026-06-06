@@ -1,10 +1,9 @@
 import { HomeCta } from "@/components/home/HomeCta";
-import { HomeGuaranteeStats } from "@/components/home/HomeGuaranteeStats";
+import { HomeStatsReviewsSection } from "@/components/home/HomeStatsReviewsSection";
 import { CategoryServiceBrowser } from "@/components/home/CategoryServiceBrowser";
 import { HomeHero } from "@/components/home/Hero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PopularCategories } from "@/components/home/PopularCategories";
-import { CustomerReviews } from "@/components/home/CustomerReviews";
 import { getHomepageContentSafe } from "@/lib/homepage/get-homepage-content";
 
 export default async function HomePage() {
@@ -17,18 +16,6 @@ export default async function HomePage() {
       {config.showPopularServices ? (
         <CategoryServiceBrowser categories={content.categoryBrowser} />
       ) : null}
-      {config.showHowItWorks ? (
-        <HowItWorks
-          section={{
-            eyebrow: config.howItWorksEyebrow,
-            title: config.howItWorksTitle,
-            subtitle: config.howItWorksSubtitle,
-            ctaLabel: config.howItWorksCtaLabel,
-            ctaHref: config.howItWorksCtaHref,
-          }}
-          steps={content.howItWorksSteps}
-        />
-      ) : null}
       {config.showCategories ? (
         <PopularCategories
           categories={content.categories}
@@ -39,6 +26,18 @@ export default async function HomePage() {
             ctaLabel: config.categoriesCtaLabel,
             ctaHref: config.categoriesCtaHref,
           }}
+        />
+      ) : null}
+      {config.showHowItWorks ? (
+        <HowItWorks
+          section={{
+            eyebrow: config.howItWorksEyebrow,
+            title: config.howItWorksTitle,
+            subtitle: config.howItWorksSubtitle,
+            ctaLabel: config.howItWorksCtaLabel,
+            ctaHref: config.howItWorksCtaHref,
+          }}
+          steps={content.howItWorksSteps}
         />
       ) : null}
       {config.showBottomCta ? (
@@ -54,24 +53,12 @@ export default async function HomePage() {
           }}
         />
       ) : null}
-      <HomeGuaranteeStats
+      <HomeStatsReviewsSection
         compactTop={config.showBottomCta}
-        guarantee={{
-          title: config.guaranteeTitle,
-          text: config.guaranteeText,
-        }}
-        stats={content.stats}
+        showReviews={config.showReviews}
+        reviewsSection={{ title: config.reviewsTitle }}
+        testimonials={content.testimonials}
       />
-      {config.showReviews ? (
-        <CustomerReviews
-          section={{
-            eyebrow: config.reviewsEyebrow,
-            title: config.reviewsTitle,
-            subtitle: config.reviewsSubtitle,
-          }}
-          testimonials={content.testimonials}
-        />
-      ) : null}
     </>
   );
 }
